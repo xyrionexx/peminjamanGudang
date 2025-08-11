@@ -1,37 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import Navbar from "@/components/navbar";
 
 export default function HomePage() {
   return (
     <>
-      <nav className="fixed z-[100] w-screen navbar flex h-20 justify-between items-center bg-amber-50 shadow-2xl">
-        <div
-          className="logo text-4xl ml-5 font-bold"
-          style={{ color: "#D2C2AF" }}
-        >
-          G-Ware
-        </div>
-        <div className="loginSignUp  flex gap-5 mr-10 justify-center">
-          <p className="flex justify-center items-center">
-            <a href="" style={{ color: "#A2AF9B" }}>
-              Syarat & Ketentuan
-            </a>
-          </p>
-          <button
-            className=" py-2 px-5 rounded-md bg-amber-50"
-            style={{ backgroundColor: "#A2AF9B" }}
-          >
-            LogIn
-          </button>
-          <button
-            className="py-2 px-5 rounded-md"
-            style={{ backgroundColor: "#A2AF9B" }}
-          >
-            Sign In
-          </button>
-        </div>
-      </nav>
+      <Navbar />
 
       <section
         className="heroPage z-[-1] w-screen h-screen bg-cover bg-center bg-no-repeat relative"
