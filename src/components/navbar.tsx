@@ -2,7 +2,7 @@
 
 export default function Navbar() {
     return (
-			<header className='w-full bg-[#faf9ee] px-6 py-5 shadow-sm border-b border-[#eeeeee]/30'>
+			<header className='w-full bg-[#faf9ee] px-6 py-5 shadow-sm border-b border-[#eeeeee]/30 top-0 z-50 fixed'>
 				<div className='flex items-center justify-between max-w-7xl mx-auto'>
 					{/* Logo */}
 					<div className='text-3xl font-bold text-[#d2c2af] tracking-tight'>
