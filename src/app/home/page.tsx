@@ -2,6 +2,9 @@
 
 import Navbar from "@/components/navbar";
 import HeroSection from "@/components/herosection";
+import Syaratketentuan from "@/components/syaratKetentuan";
+import Image from "next/image";
+import Footer from "@/components/footer";
 
 export default function HomePage() {
   return (
@@ -9,15 +12,9 @@ export default function HomePage() {
       <Navbar />
 
       <HeroSection />
+      <Syaratketentuan />
 
-      <section
-        className="w-screen h-screen "
-        style={{ backgroundColor: "#FAF9EE" }}
-      >
-        <p className="font-bold" style={{ color: "#A2AF9B" }}>
-          Syarat & Ketentuan
-        </p>
-      </section>
+      <Footer />
     </>
   );
 }
