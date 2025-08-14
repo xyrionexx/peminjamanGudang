@@ -146,8 +146,8 @@ export default function DaftarBarang() {
 						</div>
 						<h2 className='text-black text-3xl'>Peminjaman Barang Gudang</h2>
 					</div>
-					<div className='searchMenu flex px-10 justify-between pb-4'>
-						<div className='search flex relative border-2 border-black'>
+					<div className='searchMenu flex px-10 items-center justify-between pb-4'>
+						<div className='search flex relative border-2 border-black rounded-full'>
 							<input
 								className='outline-none w-[30vw] py-1 px-2'
 								type='text'
