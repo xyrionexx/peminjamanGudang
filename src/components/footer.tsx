@@ -1,5 +1,5 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 export default function Footer() {
   return (
