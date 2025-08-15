@@ -3,6 +3,7 @@
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Github, Chrome, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 export default function Signin() {
 	const { status } = useSession();
@@ -42,7 +43,7 @@ export default function Signin() {
 
 	return (
 		<div className='min-h-screen flex items-center justify-center bg-gray-50 px-4'>
-			<div className='w-full max-w-md bg-white rounded-lg shadow-lg border border-gray-200'>
+			<div className='w-full max-w-md bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col gap-5'>
 				<div className='p-6 text-center border-b border-gray-100'>
 					<h1 className='text-2xl font-bold text-gray-900 mb-2'>Sign In</h1>
 					<p className='text-gray-600 text-sm'>
@@ -66,6 +67,10 @@ export default function Signin() {
 						<Github className='h-5 w-5' />
 						Sign in with GitHub
 					</button>
+				</div>
+
+				<div className='flex justify-center border-t border-gray-200 pt-5'>
+					<Link href="/" className="text-[#41218b] text-center font-semibold mb-5">Back to home</Link>
 				</div>
 			</div>
 		</div>

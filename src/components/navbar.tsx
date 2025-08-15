@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { Link } from "react-scroll";
 
 export default function Navbar() {
     const router: AppRouterInstance = useRouter();
@@ -12,13 +11,6 @@ export default function Navbar() {
 					{/* Logo */}
 					<div className='text-3xl font-bold text-[#d2c2af] tracking-tight'>
 						G-Ware
-					</div>
-
-					{/* Center text */}
-					<div className='text-[#a2af9b] font-semibold text-lg tracking-wide cursor-pointer hover:text-[#8fa085]'>
-						<Link to="syarat" smooth={true} duration={500}>
-							Syarat & Ketentuan
-						</Link>
 					</div>
 
 					{/* Action buttons */}
