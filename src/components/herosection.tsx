@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-between max-w-7xl mx-auto">
@@ -22,7 +23,7 @@ export default function HeroSection() {
         <img
           src="https://picsum.photos/id/1015/800/600"
           alt=""
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-lg shadow-lg"
         />
       </div>
     </section>

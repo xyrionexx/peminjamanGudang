@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Logo from "../assets/image.png";
 import { Search, Package, AlertCircle, CheckCircle, Clock } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
@@ -128,7 +129,7 @@ export default function DaftarBarang() {
 		},
 	];
 
-  return (
+	return (
 		<>
 			<div className='fixed top-0 left-0 right-0 z-50 bg-white shadow-md'>
 				<div className='navbar'>
@@ -140,8 +141,11 @@ export default function DaftarBarang() {
 								height={80}
 								width={80}
 							/>
-							<h1 className='text-black text-5xl font-bold'>
+							<h1 className='text-black text-5xl font-bold flex items-center gap-2'>
 								WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()}
+								<Button className='ml-2 bg-[#8b3412]' variant='default' size='sm' onClick={() => signOut()}>
+									Logout
+								</Button>
 							</h1>
 						</div>
 						<h2 className='text-black text-3xl'>Peminjaman Barang Gudang</h2>
