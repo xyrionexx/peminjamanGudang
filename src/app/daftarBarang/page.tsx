@@ -143,6 +143,8 @@ export default function DaftarBarang() {
 							/>
 							<h1 className='text-black text-5xl font-bold flex items-center gap-2'>
 								WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()}
+
+								{/* sementara tombol logout nya disimpan disini dulu */}
 								<Button className='ml-2 bg-[#8b3412]' variant='default' size='sm' onClick={() => signOut()}>
 									Logout
 								</Button>
