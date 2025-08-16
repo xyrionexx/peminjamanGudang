@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@iconify/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Syaratketentuan() {
@@ -19,7 +20,15 @@ export default function Syaratketentuan() {
 						{/* Syarat Peminjaman Card */}
 						<Card className='h-full border-[#A2AF9B]'>
 							<CardHeader>
-								<CardTitle className='text-2xl font-bold'>
+								<CardTitle className='text-2xl font-bold flex gap-5 flex-row items-center'>
+									<div className='flex items-center justify-center bg-[#A2AF9B] rounded-full w-12 h-12'>
+										<Icon
+											icon='basil:document-solid'
+											width='24'
+											height='24'
+											style={{ color: "#FFFFFF" }}
+										/>
+									</div>
 									Syarat Peminjaman
 								</CardTitle>
 							</CardHeader>
@@ -41,9 +50,17 @@ export default function Syaratketentuan() {
 						</Card>
 
 						{/* Ketentuan Peminjaman Card */}
-						<Card className='h-full border-[#40b800]'>
+						<Card className='h-full border-[#A2AF9B]'>
 							<CardHeader>
-								<CardTitle className='text-2xl font-bold'>
+								<CardTitle className='text-2xl font-bold flex gap-5 flex-row items-center'>
+									<div className='flex items-center justify-center bg-[#A2AF9B] rounded-full w-12 h-12'>
+										<Icon
+											icon='codicon:law'
+											width='24'
+											height='24'
+											style={{ color: "#FFFFFF" }}
+										/>
+									</div>
 									Ketentuan Peminjaman
 								</CardTitle>
 							</CardHeader>
