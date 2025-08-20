@@ -4,6 +4,7 @@ import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Github, Chrome, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function Signin() {
 	const { status } = useSession();
@@ -37,9 +38,11 @@ export default function Signin() {
 		);
 	}
 
-	if (status === "authenticated") {
-		router.back();
-	}
+	const callbackURL = () => {
+		const fullUrl = new URL(window.location.href);
+		const urlParam = new URLSearchParams(fullUrl.search);
+		return urlParam.get("callbackUrl") || "/";
+	};
 
 	return (
 		<div className='min-h-screen flex items-center justify-center bg-gray-50 px-4'>
@@ -53,7 +56,7 @@ export default function Signin() {
 				<div className='p-6 space-y-4'>
 					<button
 						onClick={() =>
-							signIn("google", { callbackUrl: "/home", prompt: "login" })
+							signIn("google", { callbackUrl: callbackURL(), prompt: "login" })
 						}
 						className='w-full h-12 px-4 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 flex items-center justify-center gap-2 text-gray-700 font-medium'>
 						<Chrome className='h-5 w-5' />
@@ -61,7 +64,7 @@ export default function Signin() {
 					</button>
 					<button
 						onClick={() =>
-							signIn("github", { callbackUrl: "/home", prompt: "login" })
+							signIn("github", { callbackUrl: callbackURL(), prompt: "login" })
 						}
 						className='w-full h-12 px-4 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 flex items-center justify-center gap-2 text-gray-700 font-medium'>
 						<Github className='h-5 w-5' />

@@ -43,7 +43,7 @@ export default function DaftarBarang() {
 	}
 
 	if (status === "unauthenticated") {
-		router.push("/signin");
+		router.push("/signin?callbackUrl=/daftarBarang");
 	}
 
 	const DataBarang = [

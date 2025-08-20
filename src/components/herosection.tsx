@@ -7,7 +7,7 @@ export default function HeroSection() {
     <section className="relative min-h-screen flex items-center justify-between max-w-7xl mx-auto">
       {/* Content */}
       <div className="relative z-10 px-4 max-w-4xl">
-        <h1 className="text-4xl md:text-6xl font-bold text-black mb-4 leading-tight">
+        <h1 className="text-4xl md:text-6xl font-bold text-[#A2AF9B] mb-4 leading-tight">
           Booking
         </h1>
         <h1 className="text-4xl md:text-6xl font-semibold text-black mb-4 leading-tight">
