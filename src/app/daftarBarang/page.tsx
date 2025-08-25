@@ -5,11 +5,21 @@ import dummyImage from "../assets/dummy.jpg";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Logo from "../assets/image.png";
-import { Search, Package, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+
+import {
+	Drawer,
+	DrawerClose,
+	DrawerContent,
+	DrawerDescription,
+	DrawerFooter,
+	DrawerHeader,
+	DrawerTitle,
+	DrawerTrigger,
+} from "@/components/ui/drawer";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
@@ -250,7 +260,7 @@ export default function DaftarBarang() {
 										}
 									})()}
 
-									{category.map((item, index) => (
+									{category.map((item) => (
 										<li key={item.name}>
 											<Button
 												variant={item.status ? "default" : "outline"}
@@ -267,12 +277,37 @@ export default function DaftarBarang() {
 							</div>
 							<div className='pinjam'>
 								<button className='hover:bg-gray-100 p-2 rounded transition-colors'>
-									<Icon
-										icon='fluent-mdl2:work-item'
-										width='24'
-										height='24'
-										style={{ color: "#000" }}
-									/>
+									<Drawer>
+										{/* Trigger */}
+										<DrawerTrigger>
+											<Button variant='outline'>
+												<Icon
+													icon='fluent-mdl2:work-item'
+													width='24'
+													height='24'
+													style={{ color: "#000" }}
+												/>
+											</Button>
+										</DrawerTrigger>
+
+										<DrawerContent>
+											{/* Header */}
+											<DrawerHeader>
+												<DrawerTitle>Are you absolutely sure?</DrawerTitle>
+												<DrawerDescription>
+													This action cannot be undone.
+												</DrawerDescription>
+											</DrawerHeader>
+
+											{/* Footer */}
+											<DrawerFooter className='flex gap-2'>
+												{/* <Button variant='default' size='sm' className='max-w-xl'>Submit</Button> */}
+												<DrawerClose>
+													<Button variant='outline' size='sm'>Cancel</Button>
+												</DrawerClose>
+											</DrawerFooter>
+										</DrawerContent>
+									</Drawer>
 								</button>
 							</div>
 						</div>
