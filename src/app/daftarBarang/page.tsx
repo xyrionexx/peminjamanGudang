@@ -1,6 +1,6 @@
 "use client";
 import { Icon } from "@iconify/react";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import dummyImage from "../assets/dummy.jpg";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,10 +9,55 @@ import { Search, Package, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
 	const router = useRouter();
+
+	let [selectedCategory, setSelectedCategory] = useState<string[]>([]);
+
+	const [category, setCategory] = useState<{ name: string; status: boolean }[]>(
+		[
+			{
+				name: "Audio",
+				status: false,
+			},
+			{
+				name: "Elektronik",
+				status: false,
+			},
+			{
+				name: "Komputer",
+				status: false,
+			},
+			{
+				name: "Aksesoris",
+				status: false,
+			},
+			{
+				name: "Peralatan",
+				status: false,
+			},
+			{
+				name: "Sound",
+				status: false,
+			},
+			{
+				name: "Fotografi",
+				status: false,
+			},
+		]
+	);
+
+	interface DataBarangType {
+		id: number;
+		gambar: StaticImageData;
+		nama: string;
+		desc: string;
+		stok: number;
+		kategori: string;
+	}
 
 	if (status === "loading") {
 		return (
@@ -46,7 +91,7 @@ export default function DaftarBarang() {
 		router.push("/signin?callbackUrl=/daftarBarang");
 	}
 
-	const DataBarang = [
+	const DataBarang: DataBarangType[] = [
 		{
 			id: 1,
 			gambar: dummyImage,
@@ -129,6 +174,25 @@ export default function DaftarBarang() {
 		},
 	];
 
+	const handleCategory = (category: { name: string; status: boolean }) => {
+		if (selectedCategory.includes(category.name)) {
+			setSelectedCategory((prev) =>
+				prev.filter((item) => item !== category.name)
+			);
+		} else {
+			setSelectedCategory((prev) => [...prev, category.name]);
+		}
+
+		category.status = !category.status;
+	};
+
+	const handleClearAll = () => {
+		setSelectedCategory([]);
+		category.forEach((item) => {
+			item.status = false;
+		});
+	};
+
 	return (
 		<>
 			<div className='fixed top-0 left-0 right-0 z-50 bg-white shadow-md'>
@@ -143,9 +207,12 @@ export default function DaftarBarang() {
 							/>
 							<h1 className='text-black text-5xl font-bold flex items-center gap-2'>
 								WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()}
-
 								{/* sementara tombol logout nya disimpan disini dulu */}
-								<Button className='ml-2 bg-[#8b3412]' variant='default' size='sm' onClick={() => signOut()}>
+								<Button
+									className='ml-2 bg-[#8b3412]'
+									variant='default'
+									size='sm'
+									onClick={() => signOut()}>
 									Logout
 								</Button>
 							</h1>
@@ -170,41 +237,32 @@ export default function DaftarBarang() {
 						<div className='menu flex gap-5'>
 							<div className='kategori'>
 								<ul className='flex text-black gap-5'>
-									<li>
-										<a
-											href='#'
-											className='hover:text-gray-600 transition-colors'>
-											Audio
-										</a>
-									</li>
-									<li>
-										<a
-											href='#'
-											className='hover:text-gray-600 transition-colors'>
-											Elektronik
-										</a>
-									</li>
-									<li>
-										<a
-											href='#'
-											className='hover:text-gray-600 transition-colors'>
-											Peralatan
-										</a>
-									</li>
-									<li>
-										<a
-											href='#'
-											className='hover:text-gray-600 transition-colors'>
-											Sound
-										</a>
-									</li>
-									<li>
-										<a
-											href='#'
-											className='hover:text-gray-600 transition-colors'>
-											Fotografi
-										</a>
-									</li>
+									{(() => {
+										if (selectedCategory.length > 0) {
+											return (
+												<Button
+													variant='destructive'
+													size='sm'
+													onClick={handleClearAll}>
+													Clear all
+												</Button>
+											);
+										}
+									})()}
+
+									{category.map((item, index) => (
+										<li key={item.name}>
+											<Button
+												variant={item.status ? "default" : "outline"}
+												size='sm'
+												onClick={() => {
+													handleCategory(item);
+												}}
+												className='hover:text-gray-600 transition-colors'>
+												{item.name}
+											</Button>
+										</li>
+									))}
 								</ul>
 							</div>
 							<div className='pinjam'>
@@ -225,54 +283,113 @@ export default function DaftarBarang() {
 			<div className='DaftarBarang flex flex-col gap-4 pt-[280px]'>
 				<div className='dataBarang flex flex-col'>
 					<div className='daftarBaran flex flex-wrap shrink-0 gap-10 justify-center items-center'>
+						{/* Badge */}
+						<div className='flex gap-2'>
+							{selectedCategory.map((category) => (
+								<Badge variant='outline'>{category}</Badge>
+							))}
+						</div>
+
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
 							{DataBarang.map((item) => {
-								return (
-									<Card
-										key={item.id}
-										className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
-										<CardHeader className='p-0'>
-											<div className='relative overflow-hidden rounded-t-lg'>
-												<Image
-													src={item.gambar || "/placeholder.svg"}
-													alt={item.nama}
-													width={300}
-													height={200}
-													className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
-												/>
-												<div className='absolute top-3 right-3'>
+								if (
+									selectedCategory.length > 0 &&
+									selectedCategory.includes(item.kategori)
+								) {
+									return (
+										<Card
+											key={item.id}
+											className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
+											<CardHeader className='p-0'>
+												<div className='relative overflow-hidden rounded-t-lg'>
+													<Image
+														src={item.gambar || "/placeholder.svg"}
+														alt={item.nama}
+														width={300}
+														height={200}
+														className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
+													/>
+													<div className='absolute top-3 right-3'>
+														<Badge
+															variant='secondary'
+															className='bg-white/90 text-gray-700'>
+															{item.kategori}
+														</Badge>
+													</div>
+												</div>
+											</CardHeader>
+											<CardContent className='p-4'>
+												<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
+													{item.nama}
+												</CardTitle>
+												<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
+													{item.desc}
+												</p>
+
+												<div className='flex items-center justify-between'>
+													<div className='flex items-center gap-2'>
+														<div className='w-2 h-2 rounded-full bg-green-500'></div>
+														<span className='text-sm font-medium text-gray-700'>
+															Stok: {item.stok}
+														</span>
+													</div>
 													<Badge
-														variant='secondary'
-														className='bg-white/90 text-gray-700'>
-														{item.kategori}
+														variant='outline'
+														className='text-green-600 border-green-600'>
+														Available
 													</Badge>
 												</div>
-											</div>
-										</CardHeader>
-										<CardContent className='p-4'>
-											<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
-												{item.nama}
-											</CardTitle>
-											<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
-												{item.desc}
-											</p>
-
-											<div className='flex items-center justify-between'>
-												<div className='flex items-center gap-2'>
-													<div className='w-2 h-2 rounded-full bg-green-500'></div>
-													<span className='text-sm font-medium text-gray-700'>
-														Stok: {item.stok}
-													</span>
+											</CardContent>
+										</Card>
+									);
+								} else if (selectedCategory.length === 0) {
+									return (
+										<Card
+											key={item.id}
+											className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
+											<CardHeader className='p-0'>
+												<div className='relative overflow-hidden rounded-t-lg'>
+													<Image
+														src={item.gambar || "/placeholder.svg"}
+														alt={item.nama}
+														width={300}
+														height={200}
+														className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
+													/>
+													<div className='absolute top-3 right-3'>
+														<Badge
+															variant='secondary'
+															className='bg-white/90 text-gray-700'>
+															{item.kategori}
+														</Badge>
+													</div>
 												</div>
-												<Badge
-													variant='outline'
-													className='text-green-600 border-green-600'>
-													Available
-												</Badge>
-											</div>
-										</CardContent>
-									</Card>
-								);
+											</CardHeader>
+											<CardContent className='p-4'>
+												<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
+													{item.nama}
+												</CardTitle>
+												<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
+													{item.desc}
+												</p>
+
+												<div className='flex items-center justify-between'>
+													<div className='flex items-center gap-2'>
+														<div className='w-2 h-2 rounded-full bg-green-500'></div>
+														<span className='text-sm font-medium text-gray-700'>
+															Stok: {item.stok}
+														</span>
+													</div>
+													<Badge
+														variant='outline'
+														className='text-green-600 border-green-600'>
+														Available
+													</Badge>
+												</div>
+											</CardContent>
+										</Card>
+									);
+								}
 							})}
 						</div>
 					</div>
