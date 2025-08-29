@@ -8,7 +8,7 @@ import Logo from "../assets/image.png";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect, JSX } from "react";
 
 import {
 	Drawer,
@@ -20,6 +20,8 @@ import {
 	DrawerTitle,
 	DrawerTrigger,
 } from "@/components/ui/drawer";
+
+import murmurhash from "murmurhash";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
@@ -59,6 +61,12 @@ export default function DaftarBarang() {
 			},
 		]
 	);
+
+	const [searchValue, setSearchValue] = useState<string>("");
+
+	const [dataFound, setDataFound] = useState<DataBarangType>();
+
+	const [isFound, setIsFound] = useState<boolean>(false);
 
 	interface DataBarangType {
 		id: number;
@@ -100,6 +108,55 @@ export default function DaftarBarang() {
 	if (status === "unauthenticated") {
 		router.push("/signin?callbackUrl=/daftarBarang");
 	}
+
+	const CardViews = (item: DataBarangType | undefined): JSX.Element => {
+		return (
+			<Card
+				key={item?.id}
+				className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
+				<CardHeader className='p-0'>
+					<div className='relative overflow-hidden rounded-t-lg'>
+						<Image
+							src={item?.gambar || "/placeholder.svg"}
+							alt={item?.nama ?? "Item"}
+							width={300}
+							height={200}
+							className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
+						/>
+						<div className='absolute top-3 right-3'>
+							<Badge
+								variant='secondary'
+								className='bg-white/90 text-gray-700'>
+								{item?.kategori}
+							</Badge>
+						</div>
+					</div>
+				</CardHeader>
+				<CardContent className='p-4'>
+					<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
+						{item?.nama}
+					</CardTitle>
+					<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
+						{item?.desc}
+					</p>
+
+					<div className='flex items-center justify-between'>
+						<div className='flex items-center gap-2'>
+							<div className='w-2 h-2 rounded-full bg-green-500'></div>
+							<span className='text-sm font-medium text-gray-700'>
+								Stok: {item?.stok}
+							</span>
+						</div>
+						<Badge
+							variant='outline'
+							className='text-green-600 border-green-600'>
+							Available
+						</Badge>
+					</div>
+				</CardContent>
+			</Card>
+		);
+	};
 
 	const DataBarang: DataBarangType[] = [
 		{
@@ -151,15 +208,15 @@ export default function DaftarBarang() {
 			kategori: "Aksesoris",
 		},
 		{
-			id: 8,
+			id: 7,
 			gambar: dummyImage,
-			nama: "Monitor",
+			nama: "Monitor LED",
 			desc: "Monitor Full HD dengan warna tajam dan refresh rate tinggi.",
 			stok: 10,
 			kategori: "Komputer",
 		},
 		{
-			id: 9,
+			id: 8,
 			gambar: dummyImage,
 			nama: "Printer",
 			desc: "Printer multifungsi untuk cetak, scan, dan fotokopi.",
@@ -167,7 +224,7 @@ export default function DaftarBarang() {
 			kategori: "Peralatan Kantor",
 		},
 		{
-			id: 10,
+			id: 9,
 			gambar: dummyImage,
 			nama: "Scanner",
 			desc: "Scanner dokumen resolusi tinggi untuk kebutuhan kantor.",
@@ -175,12 +232,20 @@ export default function DaftarBarang() {
 			kategori: "Peralatan Kantor",
 		},
 		{
-			id: 11,
+			id: 10,
 			gambar: dummyImage,
 			nama: "Whiteboard",
 			desc: "Whiteboard magnetik untuk presentasi dan brainstorming.",
 			stok: 7,
 			kategori: "Peralatan Kantor",
+		},
+		{
+			id: 11,
+			gambar: dummyImage,
+			nama: "Monitor AMOLED",
+			desc: "Monitor 4k dengan warna tajam dan refresh rate tinggi.",
+			stok: 10,
+			kategori: "Komputer",
 		},
 	];
 
@@ -196,12 +261,14 @@ export default function DaftarBarang() {
 		category.status = !category.status;
 	};
 
-	const handleClearAll = () => {
+	const handleClearAll = (): void => {
 		setSelectedCategory([]);
 		category.forEach((item) => {
 			item.status = false;
 		});
 	};
+
+	const handleSearch = (): void => {};
 
 	return (
 		<>
@@ -234,15 +301,20 @@ export default function DaftarBarang() {
 							<input
 								className='outline-none w-[30vw] py-1 px-2'
 								type='text'
-								placeholder='Search items...'
+								placeholder='Tulis nama barang dengan benar ya...'
+								onChange={(e) => setSearchValue(e.target.value.toLowerCase())}
 							/>
-							<Icon
-								icon='line-md:search'
-								width='24'
-								height='24'
-								style={{ color: "#000" }}
-								className='absolute top-1 right-2'
-							/>
+							<Button
+								variant='ghost'
+								onClick={handleSearch}>
+								<Icon
+									icon='line-md:search'
+									width='24'
+									height='24'
+									style={{ color: "#000" }}
+									className='absolute top-1 right-2'
+								/>
+							</Button>
 						</div>
 						<div className='menu flex gap-5'>
 							<div className='kategori'>
@@ -261,7 +333,7 @@ export default function DaftarBarang() {
 									})()}
 
 									{category.map((item) => (
-										<li key={item.name}>
+										<li>
 											<Button
 												variant={item.status ? "default" : "outline"}
 												size='sm'
@@ -303,7 +375,11 @@ export default function DaftarBarang() {
 											<DrawerFooter className='flex gap-2'>
 												{/* <Button variant='default' size='sm' className='max-w-xl'>Submit</Button> */}
 												<DrawerClose>
-													<Button variant='outline' size='sm'>Cancel</Button>
+													<Button
+														variant='outline'
+														size='sm'>
+														Cancel
+													</Button>
 												</DrawerClose>
 											</DrawerFooter>
 										</DrawerContent>
@@ -326,123 +402,24 @@ export default function DaftarBarang() {
 						</div>
 
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
-							{DataBarang.map((item) => {
-								if (
-									selectedCategory.length > 0 &&
-									selectedCategory.includes(item.kategori)
-								) {
-									return (
-										<Card
-											key={item.id}
-											className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
-											<CardHeader className='p-0'>
-												<div className='relative overflow-hidden rounded-t-lg'>
-													<Image
-														src={item.gambar || "/placeholder.svg"}
-														alt={item.nama}
-														width={300}
-														height={200}
-														className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
-													/>
-													<div className='absolute top-3 right-3'>
-														<Badge
-															variant='secondary'
-															className='bg-white/90 text-gray-700'>
-															{item.kategori}
-														</Badge>
-													</div>
-												</div>
-											</CardHeader>
-											<CardContent className='p-4'>
-												<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
-													{item.nama}
-												</CardTitle>
-												<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
-													{item.desc}
-												</p>
+							{isFound && CardViews(dataFound)}
 
-												<div className='flex items-center justify-between'>
-													<div className='flex items-center gap-2'>
-														<div className='w-2 h-2 rounded-full bg-green-500'></div>
-														<span className='text-sm font-medium text-gray-700'>
-															Stok: {item.stok}
-														</span>
-													</div>
-													<Badge
-														variant='outline'
-														className='text-green-600 border-green-600'>
-														Available
-													</Badge>
-												</div>
-											</CardContent>
-										</Card>
-									);
-								} else if (selectedCategory.length === 0) {
-									return (
-										<Card
-											key={item.id}
-											className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
-											<CardHeader className='p-0'>
-												<div className='relative overflow-hidden rounded-t-lg'>
-													<Image
-														src={item.gambar || "/placeholder.svg"}
-														alt={item.nama}
-														width={300}
-														height={200}
-														className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
-													/>
-													<div className='absolute top-3 right-3'>
-														<Badge
-															variant='secondary'
-															className='bg-white/90 text-gray-700'>
-															{item.kategori}
-														</Badge>
-													</div>
-												</div>
-											</CardHeader>
-											<CardContent className='p-4'>
-												<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
-													{item.nama}
-												</CardTitle>
-												<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
-													{item.desc}
-												</p>
+							{!isFound &&
+								DataBarang.map((item) => {
+									if (selectedCategory.length === 0) {
+										return CardViews(item);
+									}
 
-												<div className='flex items-center justify-between'>
-													<div className='flex items-center gap-2'>
-														<div className='w-2 h-2 rounded-full bg-green-500'></div>
-														<span className='text-sm font-medium text-gray-700'>
-															Stok: {item.stok}
-														</span>
-													</div>
-													<Badge
-														variant='outline'
-														className='text-green-600 border-green-600'>
-														Available
-													</Badge>
-												</div>
-											</CardContent>
-										</Card>
-									);
-								}
-							})}
+									if (
+										selectedCategory.length > 0 &&
+										selectedCategory.includes(item.nama)
+									) {
+										return CardViews(item);
+									}
+
+									return null;
+								})}
 						</div>
-					</div>
-				</div>
-
-				<div className='p-6'>
-					<h3 className='text-2xl font-bold mb-4'>Additional Content</h3>
-					<div className='space-y-4'>
-						{Array.from({ length: 10 }, (_, i) => (
-							<div
-								key={i}
-								className='p-4 bg-gray-100 rounded-lg'>
-								<p className='text-gray-700'>
-									This is additional content item {i + 1}. Scroll down to see
-									how the navbar stays fixed at the top of the page.
-								</p>
-							</div>
-						))}
 					</div>
 				</div>
 			</div>
