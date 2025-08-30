@@ -350,10 +350,12 @@ export default function DaftarBarang() {
 		});
 	};
 
-	const handleSearch = (): void => {
+	const handleSearch = (searchvalue: string): void => {
+		if (searchvalue.length === 0) setIsFound(false); setDataFound(null);
+
 		const result: DataBarangType[] | null = B_Search(
 			SortedBarangAZ,
-			searchValue
+			searchvalue
 		);
 		if (result === undefined) return;
 		setDataFound(result);
@@ -394,9 +396,9 @@ export default function DaftarBarang() {
 								className='outline-none w-[30vw] py-1 px-2'
 								type='text'
 								placeholder='Tulis nama barang dengan benar ya...'
-								onChange={(e) => setSearchValue(e.target.value.toLowerCase())}
+								onChange={(e) => handleSearch(e.target.value.toLowerCase())}
 							/>
-							<Button
+							{/* <Button
 								variant='ghost'
 								onClick={handleSearch}>
 								<Icon
@@ -406,7 +408,7 @@ export default function DaftarBarang() {
 									style={{ color: "#000" }}
 									className='absolute top-1 right-2'
 								/>
-							</Button>
+							</Button> */}
 						</div>
 						<div className='menu flex gap-5'>
 							<div className='kategori'>
