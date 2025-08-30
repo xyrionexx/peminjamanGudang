@@ -21,7 +21,7 @@ import {
 	DrawerTrigger,
 } from "@/components/ui/drawer";
 
-import murmurhash from "murmurhash";
+import { B_Search } from "./Binary-Search";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
@@ -64,7 +64,7 @@ export default function DaftarBarang() {
 
 	const [searchValue, setSearchValue] = useState<string>("");
 
-	const [dataFound, setDataFound] = useState<DataBarangType>();
+	const [dataFound, setDataFound] = useState<DataBarangType[] | null>();
 
 	const [isFound, setIsFound] = useState<boolean>(false);
 
@@ -109,52 +109,122 @@ export default function DaftarBarang() {
 		router.push("/signin?callbackUrl=/daftarBarang");
 	}
 
-	const CardViews = (item: DataBarangType | undefined): JSX.Element => {
-		return (
-			<Card
-				key={item?.id}
-				className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
-				<CardHeader className='p-0'>
-					<div className='relative overflow-hidden rounded-t-lg'>
-						<Image
-							src={item?.gambar || "/placeholder.svg"}
-							alt={item?.nama ?? "Item"}
-							width={300}
-							height={200}
-							className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
-						/>
-						<div className='absolute top-3 right-3'>
+	const CardViews = (
+		itemArray: DataBarangType[] | undefined | null,
+		item: DataBarangType | undefined | null
+	): JSX.Element => {
+		// CHECK WHETHER THE BOTH OF DATA IS EXIST OR NOT
+		if (!itemArray && !item) {
+			return (
+				<Card className='p-4'>
+					<CardContent>
+						<p className='text-gray-500'>Data tidak tersedia</p>
+					</CardContent>
+				</Card>
+			);
+		}
+
+		// OBJECT
+		if (!itemArray) {
+			return (
+				<Card
+					className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
+					<CardHeader className='p-0'>
+						<div className='relative overflow-hidden rounded-t-lg'>
+							<Image
+								src={item?.gambar || "/placeholder.svg"}
+								alt={item?.nama ?? "Item"}
+								width={300}
+								height={200}
+								className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
+							/>
+							<div className='absolute top-3 right-3'>
+								<Badge
+									variant='secondary'
+									className='bg-white/90 text-gray-700'>
+									{item?.kategori}
+								</Badge>
+							</div>
+						</div>
+					</CardHeader>
+
+					<CardContent className='p-4'>
+						<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
+							{item?.nama}
+						</CardTitle>
+						<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
+							{item?.desc}
+						</p>
+
+						<div className='flex items-center justify-between'>
+							<div className='flex items-center gap-2'>
+								<div className='w-2 h-2 rounded-full bg-green-500'></div>
+								<span className='text-sm font-medium text-gray-700'>
+									Stok: {item?.stok}
+								</span>
+							</div>
 							<Badge
-								variant='secondary'
-								className='bg-white/90 text-gray-700'>
-								{item?.kategori}
+								variant='outline'
+								className='text-green-600 border-green-600'>
+								Available
 							</Badge>
 						</div>
-					</div>
-				</CardHeader>
-				<CardContent className='p-4'>
-					<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
-						{item?.nama}
-					</CardTitle>
-					<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
-						{item?.desc}
-					</p>
+					</CardContent>
+				</Card>
+			);
+		}
 
-					<div className='flex items-center justify-between'>
-						<div className='flex items-center gap-2'>
-							<div className='w-2 h-2 rounded-full bg-green-500'></div>
-							<span className='text-sm font-medium text-gray-700'>
-								Stok: {item?.stok}
-							</span>
-						</div>
-						<Badge
-							variant='outline'
-							className='text-green-600 border-green-600'>
-							Available
-						</Badge>
-					</div>
-				</CardContent>
-			</Card>
+		// ARRAY OF OBJECT
+		return (
+			<>
+				{itemArray?.map((barang) => (
+					<Card
+						key={barang.id}
+						className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
+						<CardHeader className='p-0'>
+							<div className='relative overflow-hidden rounded-t-lg'>
+								<Image
+									src={barang.gambar || "/placeholder.svg"}
+									alt={barang.nama ?? "Item"}
+									width={300}
+									height={200}
+									className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
+								/>
+								<div className='absolute top-3 right-3'>
+									<Badge
+										variant='secondary'
+										className='bg-white/90 text-gray-700'>
+										{barang.kategori}
+									</Badge>
+								</div>
+							</div>
+						</CardHeader>
+
+						<CardContent className='p-4'>
+							<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
+								{barang.nama}
+							</CardTitle>
+							<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
+								{barang.desc}
+							</p>
+
+							<div className='flex items-center justify-between'>
+								<div className='flex items-center gap-2'>
+									<div className='w-2 h-2 rounded-full bg-green-500'></div>
+									<span className='text-sm font-medium text-gray-700'>
+										Stok: {barang.stok}
+									</span>
+								</div>
+								<Badge
+									variant='outline'
+									className='text-green-600 border-green-600'>
+									Available
+								</Badge>
+							</div>
+						</CardContent>
+					</Card>
+				))}
+			</>
 		);
 	};
 
@@ -247,7 +317,19 @@ export default function DaftarBarang() {
 			stok: 10,
 			kategori: "Komputer",
 		},
+		{
+			id: 12,
+			gambar: dummyImage,
+			nama: "Kamera Mirrorless",
+			desc: "ya begitulah",
+			stok: 15,
+			kategori: "Fotorgrafi"
+		}
 	];
+
+	const SortedBarangAZ: DataBarangType[] = DataBarang.sort((a, b) => {
+		return a.nama.toLowerCase().localeCompare(b.nama.toLowerCase());
+	});
 
 	const handleCategory = (category: { name: string; status: boolean }) => {
 		if (selectedCategory.includes(category.name)) {
@@ -268,7 +350,17 @@ export default function DaftarBarang() {
 		});
 	};
 
-	const handleSearch = (): void => {};
+	const handleSearch = (): void => {
+		const result: DataBarangType[] | null = B_Search(
+			SortedBarangAZ,
+			searchValue
+		);
+		if (result === undefined) return;
+		setDataFound(result);
+		setIsFound(true);
+
+		console.log(result);
+	};
 
 	return (
 		<>
@@ -402,19 +494,19 @@ export default function DaftarBarang() {
 						</div>
 
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
-							{isFound && CardViews(dataFound)}
+							{isFound && CardViews(dataFound, null)}
 
 							{!isFound &&
 								DataBarang.map((item) => {
 									if (selectedCategory.length === 0) {
-										return CardViews(item);
+										return CardViews(null, item);
 									}
 
 									if (
 										selectedCategory.length > 0 &&
 										selectedCategory.includes(item.nama)
 									) {
-										return CardViews(item);
+										return CardViews(null, item);
 									}
 
 									return null;
