@@ -22,9 +22,10 @@ import {
 } from "@/components/ui/drawer";
 
 import { B_Search } from "./Binary-Search";
+import { eventNames } from "process";
 
 export default function DaftarBarang() {
-	const { data: session, status } = useSession();
+	// const { data: session, status } = useSession();
 	const router = useRouter();
 
 	let [selectedCategory, setSelectedCategory] = useState<string[]>([]);
@@ -127,8 +128,7 @@ export default function DaftarBarang() {
 		// OBJECT
 		if (!itemArray) {
 			return (
-				<Card
-					className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
+				<Card className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
 					<CardHeader className='p-0'>
 						<div className='relative overflow-hidden rounded-t-lg'>
 							<Image
@@ -323,8 +323,16 @@ export default function DaftarBarang() {
 			nama: "Kamera Mirrorless",
 			desc: "ya begitulah",
 			stok: 15,
-			kategori: "Fotorgrafi"
-		}
+			kategori: "Fotorgrafi",
+		},
+		{
+			id: 13,
+			gambar: dummyImage,
+			nama: "blackboard",
+			desc: "blackboard magnetik untuk presentasi dan brainstorming.",
+			stok: 7,
+			kategori: "Peralatan Kantor",
+		},
 	];
 
 	const SortedBarangAZ: DataBarangType[] = DataBarang.sort((a, b) => {
@@ -350,12 +358,16 @@ export default function DaftarBarang() {
 		});
 	};
 
-	const handleSearch = (searchvalue: string): void => {
-		if (searchvalue.length === 0) setIsFound(false); setDataFound(null);
+	const handleSearch = (): void => {
+		debugger;
+		if (searchValue.length === 0) {
+			setIsFound(false);
+			setDataFound(null);
+		}
 
 		const result: DataBarangType[] | null = B_Search(
 			SortedBarangAZ,
-			searchvalue
+			searchValue
 		);
 		if (result === undefined) return;
 		setDataFound(result);
@@ -377,7 +389,7 @@ export default function DaftarBarang() {
 								width={80}
 							/>
 							<h1 className='text-black text-5xl font-bold flex items-center gap-2'>
-								WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()}
+								{/* WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()} */}
 								{/* sementara tombol logout nya disimpan disini dulu */}
 								<Button
 									className='ml-2 bg-[#8b3412]'
@@ -396,7 +408,14 @@ export default function DaftarBarang() {
 								className='outline-none w-[30vw] py-1 px-2'
 								type='text'
 								placeholder='Tulis nama barang dengan benar ya...'
-								onChange={(e) => handleSearch(e.target.value.toLowerCase())}
+								onChange={(event) =>
+									setSearchValue(event.target.value.toLowerCase())
+								}
+								onKeyDown={(event) => {
+									if (event.key === "Enter") {
+										handleSearch();
+									}
+								}}
 							/>
 							{/* <Button
 								variant='ghost'
