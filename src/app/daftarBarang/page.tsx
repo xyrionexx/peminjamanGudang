@@ -8,7 +8,7 @@ import Logo from "../assets/image.png";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, JSX } from "react";
+import { useState, JSX } from "react";
 
 import {
 	Drawer,
@@ -22,14 +22,13 @@ import {
 } from "@/components/ui/drawer";
 
 import { B_Search } from "./Binary-Search";
-import { eventNames } from "process";
 
 export default function DaftarBarang() {
-	const { data: session, status } = useSession();
+	// const { data: session, status } = useSession();
 	const router = useRouter();
 
+	// HOOKS FOR CATEGORY
 	let [selectedCategory, setSelectedCategory] = useState<string[]>([]);
-
 	const [category, setCategory] = useState<{ name: string; status: boolean }[]>(
 		[
 			{
@@ -63,10 +62,9 @@ export default function DaftarBarang() {
 		]
 	);
 
+	// HOOKS FOR SEARCH
 	const [searchValue, setSearchValue] = useState<string>("");
-
 	const [dataFound, setDataFound] = useState<DataBarangType[] | null>();
-
 	const [isFound, setIsFound] = useState<boolean>(false);
 
 	interface DataBarangType {
@@ -323,7 +321,7 @@ export default function DaftarBarang() {
 			nama: "Kamera Mirrorless",
 			desc: "ya begitulah",
 			stok: 15,
-			kategori: "Fotorgrafi",
+			kategori: "Fotografi",
 		},
 		{
 			id: 13,
@@ -359,7 +357,6 @@ export default function DaftarBarang() {
 	};
 
 	const handleSearch = (): void => {
-		debugger;
 		if (searchValue.length === 0) {
 			setIsFound(false);
 			setDataFound(null);
@@ -390,7 +387,7 @@ export default function DaftarBarang() {
 								width={80}
 							/>
 							<h1 className='text-black text-5xl font-bold flex items-center gap-2'>
-								WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()}
+								{/* WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()} */}
 								{/* sementara tombol logout nya disimpan disini dulu */}
 								<Button
 									className='ml-2 bg-[#8b3412]'
@@ -522,7 +519,7 @@ export default function DaftarBarang() {
 									}
 									if (
 										selectedCategory.length > 0 &&
-										selectedCategory.includes(item.nama)
+										selectedCategory.includes(item.kategori)
 									) {
 										return <div key={item.id}>{CardViews(null, item)}</div>;
 									}
