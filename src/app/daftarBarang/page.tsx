@@ -24,7 +24,7 @@ import {
 import { B_Search } from "./Binary-Search";
 
 export default function DaftarBarang() {
-	// const { data: session, status } = useSession();
+	const { data: session, status } = useSession();
 	const router = useRouter();
 
 	// HOOKS FOR CATEGORY
@@ -387,7 +387,7 @@ export default function DaftarBarang() {
 								width={80}
 							/>
 							<h1 className='text-black text-5xl font-bold flex items-center gap-2'>
-								{/* WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()} */}
+								WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()}
 								{/* sementara tombol logout nya disimpan disini dulu */}
 								<Button
 									className='ml-2 bg-[#8b3412]'
