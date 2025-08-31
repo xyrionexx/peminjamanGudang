@@ -25,7 +25,7 @@ import { B_Search } from "./Binary-Search";
 import { eventNames } from "process";
 
 export default function DaftarBarang() {
-	// const { data: session, status } = useSession();
+	const { data: session, status } = useSession();
 	const router = useRouter();
 
 	let [selectedCategory, setSelectedCategory] = useState<string[]>([]);
@@ -363,6 +363,7 @@ export default function DaftarBarang() {
 		if (searchValue.length === 0) {
 			setIsFound(false);
 			setDataFound(null);
+			return;
 		}
 
 		const result: DataBarangType[] | null = B_Search(
@@ -389,7 +390,7 @@ export default function DaftarBarang() {
 								width={80}
 							/>
 							<h1 className='text-black text-5xl font-bold flex items-center gap-2'>
-								{/* WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()} */}
+								WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()}
 								{/* sementara tombol logout nya disimpan disini dulu */}
 								<Button
 									className='ml-2 bg-[#8b3412]'
@@ -446,7 +447,7 @@ export default function DaftarBarang() {
 									})()}
 
 									{category.map((item) => (
-										<li>
+										<li key={item.name}>
 											<Button
 												variant={item.status ? "default" : "outline"}
 												size='sm'
@@ -461,43 +462,36 @@ export default function DaftarBarang() {
 								</ul>
 							</div>
 							<div className='pinjam'>
-								<button className='hover:bg-gray-100 p-2 rounded transition-colors'>
-									<Drawer>
-										{/* Trigger */}
-										<DrawerTrigger>
-											<Button variant='outline'>
-												<Icon
-													icon='fluent-mdl2:work-item'
-													width='24'
-													height='24'
-													style={{ color: "#000" }}
-												/>
-											</Button>
-										</DrawerTrigger>
+								<Drawer>
+									<DrawerTrigger asChild>
+										<Button variant='outline'>
+											<Icon
+												icon='fluent-mdl2:work-item'
+												width='24'
+												height='24'
+												style={{ color: "#000" }}
+											/>
+										</Button>
+									</DrawerTrigger>
 
-										<DrawerContent>
-											{/* Header */}
-											<DrawerHeader>
-												<DrawerTitle>Are you absolutely sure?</DrawerTitle>
-												<DrawerDescription>
-													This action cannot be undone.
-												</DrawerDescription>
-											</DrawerHeader>
-
-											{/* Footer */}
-											<DrawerFooter className='flex gap-2'>
-												{/* <Button variant='default' size='sm' className='max-w-xl'>Submit</Button> */}
-												<DrawerClose>
-													<Button
-														variant='outline'
-														size='sm'>
-														Cancel
-													</Button>
-												</DrawerClose>
-											</DrawerFooter>
-										</DrawerContent>
-									</Drawer>
-								</button>
+									<DrawerContent>
+										<DrawerHeader>
+											<DrawerTitle>Are you absolutely sure?</DrawerTitle>
+											<DrawerDescription>
+												This action cannot be undone.
+											</DrawerDescription>
+										</DrawerHeader>
+										<DrawerFooter className='flex gap-2'>
+											<DrawerClose asChild>
+												<Button
+													variant='outline'
+													size='sm'>
+													Cancel
+												</Button>
+											</DrawerClose>
+										</DrawerFooter>
+									</DrawerContent>
+								</Drawer>
 							</div>
 						</div>
 					</div>
@@ -510,7 +504,11 @@ export default function DaftarBarang() {
 						{/* Badge */}
 						<div className='flex gap-2'>
 							{selectedCategory.map((category) => (
-								<Badge variant='outline'>{category}</Badge>
+								<Badge
+									key={category}
+									variant='outline'>
+									{category}
+								</Badge>
 							))}
 						</div>
 
@@ -520,16 +518,14 @@ export default function DaftarBarang() {
 							{!isFound &&
 								DataBarang.map((item) => {
 									if (selectedCategory.length === 0) {
-										return CardViews(null, item);
+										return <div key={item.id}>{CardViews(null, item)}</div>;
 									}
-
 									if (
 										selectedCategory.length > 0 &&
 										selectedCategory.includes(item.nama)
 									) {
-										return CardViews(null, item);
+										return <div key={item.id}>{CardViews(null, item)}</div>;
 									}
-
 									return null;
 								})}
 						</div>
