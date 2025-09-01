@@ -2,13 +2,12 @@
 import { Icon } from "@iconify/react";
 import Image, { StaticImageData } from "next/image";
 import dummyImage from "../assets/dummy.jpg";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Logo from "../assets/image.png";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useState, JSX } from "react";
+import { useState } from "react";
 
 import {
 	Drawer,
@@ -23,6 +22,8 @@ import {
 
 import { B_Search } from "./Binary-Search";
 import { EnhancedSearch } from "@/components/search";
+import { CardViews } from "@/components/CardViews";
+import { loading_circle } from "@/components/Loading";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
@@ -78,154 +79,12 @@ export default function DaftarBarang() {
 	}
 
 	if (status === "loading") {
-		return (
-			<div className='flex items-center justify-center min-h-[200px]'>
-				<div className='flex flex-col items-center space-y-4'>
-					{/* Spinning circle loader */}
-					<div className='relative'>
-						<div className='w-12 h-12 border-4 border-gray-200 rounded-full'></div>
-						<div className='absolute top-0 left-0 w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin'></div>
-					</div>
-
-					{/* Loading text with subtle animation */}
-					<div className='flex items-center space-x-1'>
-						<span className='text-gray-600 font-medium'>Loading</span>
-						<div className='flex space-x-1'>
-							<div className='w-1 h-1 bg-gray-400 rounded-full animate-bounce'></div>
-							<div
-								className='w-1 h-1 bg-gray-400 rounded-full animate-bounce'
-								style={{ animationDelay: "0.1s" }}></div>
-							<div
-								className='w-1 h-1 bg-gray-400 rounded-full animate-bounce'
-								style={{ animationDelay: "0.2s" }}></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		);
+		return loading_circle();
 	}
 
 	if (status === "unauthenticated") {
 		router.push("/signin?callbackUrl=/daftarBarang");
 	}
-
-	const CardViews = (
-		itemArray: DataBarangType[] | undefined | null,
-		item: DataBarangType | undefined | null
-	): JSX.Element => {
-		// CHECK WHETHER THE BOTH OF DATA IS EXIST OR NOT
-		if (!itemArray && !item) {
-			return (
-				<Card className='p-4'>
-					<CardContent>
-						<p className='text-gray-500'>Data tidak tersedia</p>
-					</CardContent>
-				</Card>
-			);
-		}
-
-		// OBJECT
-		if (!itemArray) {
-			return (
-				<Card className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
-					<CardHeader className='p-0'>
-						<div className='relative overflow-hidden rounded-t-lg'>
-							<Image
-								src={item?.gambar || "/placeholder.svg"}
-								alt={item?.nama ?? "Item"}
-								width={300}
-								height={200}
-								className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
-							/>
-							<div className='absolute top-3 right-3'>
-								<Badge
-									variant='secondary'
-									className='bg-white/90 text-gray-700'>
-									{item?.kategori}
-								</Badge>
-							</div>
-						</div>
-					</CardHeader>
-
-					<CardContent className='p-4'>
-						<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
-							{item?.nama}
-						</CardTitle>
-						<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
-							{item?.desc}
-						</p>
-
-						<div className='flex items-center justify-between'>
-							<div className='flex items-center gap-2'>
-								<div className='w-2 h-2 rounded-full bg-green-500'></div>
-								<span className='text-sm font-medium text-gray-700'>
-									Stok: {item?.stok}
-								</span>
-							</div>
-							<Badge
-								variant='outline'
-								className='text-green-600 border-green-600'>
-								Available
-							</Badge>
-						</div>
-					</CardContent>
-				</Card>
-			);
-		}
-
-		// ARRAY OF OBJECT
-		return (
-			<>
-				{itemArray?.map((barang) => (
-					<Card
-						key={barang.id}
-						className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
-						<CardHeader className='p-0'>
-							<div className='relative overflow-hidden rounded-t-lg'>
-								<Image
-									src={barang.gambar || "/placeholder.svg"}
-									alt={barang.nama ?? "Item"}
-									width={300}
-									height={200}
-									className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
-								/>
-								<div className='absolute top-3 right-3'>
-									<Badge
-										variant='secondary'
-										className='bg-white/90 text-gray-700'>
-										{barang.kategori}
-									</Badge>
-								</div>
-							</div>
-						</CardHeader>
-
-						<CardContent className='p-4'>
-							<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
-								{barang.nama}
-							</CardTitle>
-							<p className='text-sm text-gray-600 mb-4 line-clamp-2'>
-								{barang.desc}
-							</p>
-
-							<div className='flex items-center justify-between'>
-								<div className='flex items-center gap-2'>
-									<div className='w-2 h-2 rounded-full bg-green-500'></div>
-									<span className='text-sm font-medium text-gray-700'>
-										Stok: {barang.stok}
-									</span>
-								</div>
-								<Badge
-									variant='outline'
-									className='text-green-600 border-green-600'>
-									Available
-								</Badge>
-							</div>
-						</CardContent>
-					</Card>
-				))}
-			</>
-		);
-	};
 
 	const DataBarang: DataBarangType[] = [
 		{
