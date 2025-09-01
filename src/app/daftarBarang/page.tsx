@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/drawer";
 
 import { B_Search } from "./Binary-Search";
+import { EnhancedSearch } from "@/components/search";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
@@ -63,7 +64,7 @@ export default function DaftarBarang() {
 	);
 
 	// HOOKS FOR SEARCH
-	const [searchValue, setSearchValue] = useState<string>("");
+	// const [searchValue, setSearchValue] = useState<string>("");
 	const [dataFound, setDataFound] = useState<DataBarangType[] | null>();
 	const [isFound, setIsFound] = useState<boolean>(false);
 
@@ -356,7 +357,7 @@ export default function DaftarBarang() {
 		});
 	};
 
-	const handleSearch = (): void => {
+	const handleSearch = (searchValue: string): void => {
 		if (searchValue.length === 0) {
 			setIsFound(false);
 			setDataFound(null);
@@ -372,6 +373,13 @@ export default function DaftarBarang() {
 		setIsFound(true);
 
 		console.log(result);
+	};
+
+	const handleReset = () => {
+		// setSearchValue("");
+		setIsFound(false);
+		setDataFound(null);
+		return
 	};
 
 	return (
@@ -401,31 +409,13 @@ export default function DaftarBarang() {
 						<h2 className='text-black text-3xl'>Peminjaman Barang Gudang</h2>
 					</div>
 					<div className='searchMenu flex px-10 items-center justify-between pb-4'>
-						<div className='search flex relative border-2 border-black rounded-full'>
-							<input
-								className='outline-none w-[30vw] py-1 px-2'
-								type='text'
-								placeholder='Tulis nama barang dengan benar ya...'
-								onChange={(event) =>
-									setSearchValue(event.target.value.toLowerCase())
-								}
-								onKeyDown={(event) => {
-									if (event.key === "Enter") {
-										handleSearch();
-									}
-								}}
+						<div className='search flex w-full max-w-lg pr-2'>
+							<EnhancedSearch
+								placeholder="Mangga cari barang disini"
+								onSearch={handleSearch}
+								onReset={handleReset}
+								className="w-full"
 							/>
-							{/* <Button
-								variant='ghost'
-								onClick={handleSearch}>
-								<Icon
-									icon='line-md:search'
-									width='24'
-									height='24'
-									style={{ color: "#000" }}
-									className='absolute top-1 right-2'
-								/>
-							</Button> */}
 						</div>
 						<div className='menu flex gap-5'>
 							<div className='kategori'>
