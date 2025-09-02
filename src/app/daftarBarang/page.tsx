@@ -22,7 +22,7 @@ import {
 
 import { B_Search } from "./Binary-Search";
 import { EnhancedSearch } from "@/components/search";
-import { CardViews } from "@/components/CardViews";
+import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
 
 export default function DaftarBarang() {
@@ -238,7 +238,11 @@ export default function DaftarBarang() {
 		// setSearchValue("");
 		setIsFound(false);
 		setDataFound(null);
-		return
+		return;
+	};
+
+	const handleCardSignal = (pesan: string, ok: boolean) => { 
+		
 	};
 
 	return (
@@ -254,7 +258,7 @@ export default function DaftarBarang() {
 								width={80}
 							/>
 							<h1 className='text-black text-5xl font-bold flex items-center gap-2'>
-								WELCOME TO THE G-WARE {session?.user?.name?.toUpperCase()}
+								SILAHKAN, SELAMAT MEMINJAM {session?.user?.name?.toUpperCase()}
 								{/* sementara tombol logout nya disimpan disini dulu */}
 								<Button
 									className='ml-2 bg-[#8b3412]'
@@ -270,10 +274,10 @@ export default function DaftarBarang() {
 					<div className='searchMenu flex px-10 items-center justify-between pb-4'>
 						<div className='search flex w-full max-w-lg pr-2'>
 							<EnhancedSearch
-								placeholder="Mangga cari barang disini"
+								placeholder='Mangga cari barang disini'
 								onSearch={handleSearch}
 								onReset={handleReset}
-								className="w-full"
+								className='w-full'
 							/>
 						</div>
 						<div className='menu flex gap-5'>
@@ -307,6 +311,8 @@ export default function DaftarBarang() {
 									))}
 								</ul>
 							</div>
+
+							{/* KERANGJANG DRAWER */}
 							<div className='pinjam'>
 								<Drawer>
 									<DrawerTrigger asChild>
@@ -359,18 +365,27 @@ export default function DaftarBarang() {
 						</div>
 
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
-							{isFound && CardViews(dataFound, null)}
+							{isFound &&
+								dataFound?.map((item) => {
+									return <div key={item.id}>
+										<CardViews item={item} signalFromCard={handleCardSignal}></CardViews>
+									</div>;
+								})}
 
 							{!isFound &&
 								DataBarang.map((item) => {
 									if (selectedCategory.length === 0) {
-										return <div key={item.id}>{CardViews(null, item)}</div>;
+										return <div key={item.id}>
+											<CardViews item={item}></CardViews>
+										</div>;
 									}
 									if (
 										selectedCategory.length > 0 &&
 										selectedCategory.includes(item.kategori)
 									) {
-										return <div key={item.id}>{CardViews(null, item)}</div>;
+										return <div key={item.id}>
+											<CardViews item={item}></CardViews>
+										</div>;
 									}
 									return null;
 								})}
