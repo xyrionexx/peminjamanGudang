@@ -29,11 +29,13 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet";
 
+// IMPORT MILIK SENDIRI / KITA
 import { B_Search } from "./Binary-Search";
 import { EnhancedSearch } from "@/components/search";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
 import type { DataBarangType } from "@/types/global";
+import ProfileMenu from "@/components/ProfileMenu";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
@@ -219,6 +221,7 @@ export default function DaftarBarang() {
 	};
 
 	const handleSearch = (searchValue: string): void => {
+		debugger;
 		if (searchValue.length === 0) {
 			setIsFound(false);
 			setDataFound(null);
@@ -232,7 +235,7 @@ export default function DaftarBarang() {
 			| null = B_Search(SortedBarangAZ, searchValue);
 		if (result === null) return;
 		setDataFound(result);
-
+		setIsFound(true);
 		console.log(result);
 	};
 
@@ -265,9 +268,11 @@ export default function DaftarBarang() {
 
 	return (
 		<>
+			{/* NAVBAR */}
 			<div className='fixed top-0 left-0 right-0 z-50 bg-white shadow-md'>
 				<div className='navbar flex items-center justify-center py-4'>
-					<div className='searchMenu flex items-center justify-center gap-15 mx-auto'>
+					<div className='searchMenu flex items-center justify-center  mx-auto'>
+						{/* AVATAR */}
 						<div className='flex gap-3 justify-center items-center'>
 							<Avatar>
 								<AvatarImage
@@ -283,14 +288,10 @@ export default function DaftarBarang() {
 								{session?.user.name}
 							</p>
 
-							<Icon
-								icon='ep:arrow-down'
-								width='20'
-								height='20'
-								className="text-gray-500"
-							/>
+							<ProfileMenu />
 						</div>
 
+						{/* SEARCH BAR */}
 						<div className='search flex w-full max-w-lg pr-2'>
 							<EnhancedSearch
 								placeholder='Mangga cari barang disini'
@@ -300,10 +301,11 @@ export default function DaftarBarang() {
 							/>
 						</div>
 
-						{/* kategori */}
+						{/* KATEGORI */}
 						<div className='menu flex gap-5'>
 							<div className='kategori'>
 								<ul className='flex text-black gap-5'>
+									{/* TOMBOL RESET KATEGORI */}
 									{(() => {
 										if (selectedCategory.length > 0) {
 											return (
@@ -317,6 +319,7 @@ export default function DaftarBarang() {
 										}
 									})()}
 
+									{/* TOMBOL-TOMBOL KATEGORI */}
 									{category.map((item) => (
 										<li key={item.name}>
 											<Button
@@ -336,6 +339,7 @@ export default function DaftarBarang() {
 							{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
 							<div className='pinjam'>
 								<Sheet>
+									{/* TRIGGER BUTTON */}
 									<Tooltip>
 										<TooltipTrigger asChild>
 											<SheetTrigger asChild>
@@ -355,39 +359,25 @@ export default function DaftarBarang() {
 										</TooltipContent>
 									</Tooltip>
 
+									{/* SIDE RIGHT BAR  / SHEET CONTENT */}
 									<SheetContent>
 										<SheetHeader>
-											<SheetTitle className='text-green-500 text-2xl'>
+											<SheetTitle className='text-green-500 text-2xl flex items-center gap-2'>
 												Keranjang
+												<Icon
+													icon='vaadin:cart-o'
+													width='25'
+													height='25'
+												/>
 											</SheetTitle>
 											<SheetDescription>
 												Daftar belanjaan kamu nih...
 											</SheetDescription>
 										</SheetHeader>
 
-										<div className='grid flex-1 auto-rows-min gap-6 px-4'>
-											<div className='grid gap-3'>
-												<Label htmlFor='sheet-demo-name'>Name</Label>
-												<Input
-													id='sheet-demo-name'
-													defaultValue='Pedro Duarte'
-												/>
-											</div>
-											<div className='grid gap-3'>
-												<Label htmlFor='sheet-demo-username'>Username</Label>
-												<Input
-													id='sheet-demo-username'
-													defaultValue='@peduarte'
-												/>
-											</div>
+										<div className='flex mx-2'>
+											<EnhancedSearch />
 										</div>
-
-										<SheetFooter>
-											<Button type='submit'>Save changes</Button>
-											<SheetClose asChild>
-												<Button variant='outline'>Close</Button>
-											</SheetClose>
-										</SheetFooter>
 									</SheetContent>
 								</Sheet>
 							</div>
@@ -396,20 +386,10 @@ export default function DaftarBarang() {
 				</div>
 			</div>
 
+			{/* MAIN CONTENT */}
 			<div className='DaftarBarang flex flex-col gap-4 py-20'>
 				<div className='dataBarang flex flex-col'>
 					<div className='daftarBaran flex flex-wrap shrink-0 gap-10 justify-center'>
-						{/* Badge */}
-						{/* <div className='flex gap-2 pt-10'>
-							{selectedCategory.map((category) => (
-								<Badge
-									key={category}
-									variant='outline'>
-									{category}
-								</Badge>
-							))}
-						</div> */}
-
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
 							{isFound &&
 								Array.isArray(dataFound) &&
