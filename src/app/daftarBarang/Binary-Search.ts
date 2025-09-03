@@ -13,7 +13,7 @@ export function B_Search(daftarBarang: DataBarangType[], input: string) {
 	let middle: number = count_mid(low, high);
 
 	let itemFounded: DataBarangType[] = [];
-	let itemFoundedFix: DataBarangType[] = [];
+	let itemFoundedFix: (DataBarangType & {index: number})[] = [];
 
 	while (low <= high) {
 		const hasil: number = lowerInput.localeCompare(
@@ -27,7 +27,10 @@ export function B_Search(daftarBarang: DataBarangType[], input: string) {
             
             if (!(middle in itemFounded)) {
                 itemFounded[middle] = daftarBarang[middle];
-                itemFoundedFix.push(daftarBarang[middle]);
+				itemFoundedFix.push({
+					...daftarBarang[middle],
+					index: middle
+				});
             }
 
 			middle += 1;
@@ -42,5 +45,5 @@ export function B_Search(daftarBarang: DataBarangType[], input: string) {
 		middle = count_mid(low, high);
 	}
 
-	return [];
+	return null;
 }

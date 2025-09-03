@@ -1,20 +1,31 @@
 import type { DataBarangType } from "@/types/global";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import * as Kartu from "@/components/ui/card";
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	CardFooter,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { JSX } from "react";
+import { JSX, useRef, useState } from "react";
 import { Button } from "./ui/button";
+import { B_Search } from "@/app/daftarBarang/Binary-Search";
 
 type CardViewsProps = {
-	item?: DataBarangType | null;
-	signalFromCard?: (pesan: string, ok: boolean) => void;
+	item: DataBarangType | null;
+	signalFromCard: (pesan: string, ok: boolean) => void;
 };
 
 export default function CardViews({
 	item,
-	signalFromCard = () => {},
+	signalFromCard,
 }: CardViewsProps): JSX.Element {
+	const [statusItemTxt, setStatusItemTxt] = useState<
+		"Masukkin ke keranjang" | "Buang dari keranjang"
+	>("Masukkin ke keranjang");
+	const btnRef = useRef<HTMLButtonElement>(null);
+
 	// CHECK WHETHER THE BOTH OF DATA IS EXIST OR NOT
 	if (!item) {
 		return (
@@ -28,18 +39,45 @@ export default function CardViews({
 
 	const handle_AddToCart = (item: DataBarangType): void => {
 		try {
-			localStorage.setItem(item.nama, JSON.stringify(item));
-			signalFromCard("Barang berhasil dimasukkan ke keranjang", true);
+			var barang: DataBarangType[] = JSON.parse(
+				localStorage.getItem("cart") ?? "[]"
+			);
+			barang.push(item);
+			localStorage.setItem("cart", JSON.stringify(barang));
+
+			signalFromCard?.("Barang berhasil dimasukkan ke keranjang", true);
 		} catch (error) {
 			console.log("gagal menyimpan barang", error);
-			signalFromCard("Barang gagal disimpan ke keranjang :(", false);
+			signalFromCard?.("Barang gagal disimpan ke keranjang :(", false);
+		}
+	};
+
+	const handle_RemoveFromCart = (nameItem: string) => {
+		try {
+			var barang: DataBarangType[] = JSON.parse(
+				localStorage.getItem("cart") ?? "[]"
+			);
+			barang = barang.sort((a, b) =>
+				a.nama.toLowerCase().localeCompare(b.nama.toLowerCase())
+			);
+
+			const hasil: (DataBarangType & {index: number})[] | null = B_Search(barang, nameItem);
+
+			if (hasil === null) return;
+			hasil.forEach((item) => {
+				barang.splice(item.index, 1);
+			});
+
+			localStorage.setItem("cart", JSON.stringify(barang));
+		} catch (error) {
+			signalFromCard("Barangnya ngga ada di keranjang ey", false);
 		}
 	};
 
 	// OBJECT
 	return (
-		<Card className='group hover:shadow-lg transition-all duration-200 hover:-translate-y-1'>
-			<CardHeader className='p-0'>
+		<Card className='w-full max-w-sm mx-auto group hover:shadow-lg transition-all duration-200 hover:-translate-y-1 flex flex-col'>
+			<CardHeader className='p-0 flex-shrink-0'>
 				<div className='relative overflow-hidden rounded-t-lg'>
 					<Image
 						src={item?.gambar || "/placeholder.svg"}
@@ -48,21 +86,25 @@ export default function CardViews({
 						height={200}
 						className='w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200'
 					/>
-					<div className='absolute top-3 right-3'>
+					<div className='absolute top-2 right-2'>
 						<Badge
 							variant='secondary'
-							className='bg-white/90 text-gray-700'>
+							className='bg-white/90 text-gray-700 text-xs'>
 							{item?.kategori}
 						</Badge>
 					</div>
 				</div>
 			</CardHeader>
 
-			<CardContent className='p-4'>
-				<CardTitle className='text-lg font-semibold text-gray-900 mb-2'>
-					{item?.nama}
-				</CardTitle>
-				<p className='text-sm text-gray-600 mb-4 line-clamp-2'>{item?.desc}</p>
+			<CardContent className='p-4 flex-1 flex flex-col justify-between min-h-0'>
+				<div className='flex-1'>
+					<CardTitle className='text-lg font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight'>
+						{item?.nama}
+					</CardTitle>
+					<p className='text-sm text-gray-600 mb-4 line-clamp-3 leading-relaxed'>
+						{item?.desc}
+					</p>
+				</div>
 
 				<div className='flex items-center justify-between'>
 					<div className='flex items-center gap-2'>
@@ -73,25 +115,37 @@ export default function CardViews({
 					</div>
 					<Badge
 						variant='outline'
-						className='text-green-600 border-green-600'>
+						className='text-green-600 border-green-600 text-xs'>
 						Available
 					</Badge>
 				</div>
 			</CardContent>
 
-			<Kartu.CardFooter className='flex-col gap-2'>
+			<CardFooter className='flex-col gap-3 p-4 pt-0 flex-shrink-0'>
 				<Button
 					variant={"default"}
-					className='w-full bg-green-500 hover:bg-green-600'>
+					className='w-full bg-green-500 hover:bg-green-600 h-10 text-sm'>
 					Pesan sekarang
 				</Button>
 				<Button
+					ref={btnRef}
 					variant={"outline"}
-					className='w-full border-green-500'
-					onClick={() => handle_AddToCart(item)}>
-					<p className='text-green-500'>Masukkan ke keranjang</p>
+					className='w-full border-green-500 text-green-500 hover:bg-green-50 h-10 text-sm'
+					onClick={(event) => {
+						const btn_data = event.currentTarget;
+						if (!btn_data.dataset.mode || btn_data.dataset.mode === "add") {
+							handle_AddToCart(item);
+							setStatusItemTxt("Buang dari keranjang");
+							btn_data.dataset.mode = "remove";
+						} else {
+							handle_RemoveFromCart(item.nama);
+							setStatusItemTxt("Masukkin ke keranjang");
+							btn_data.dataset.mode = "add";
+						}
+					}}>
+					{statusItemTxt}
 				</Button>
-			</Kartu.CardFooter>
+			</CardFooter>
 		</Card>
 	);
 }

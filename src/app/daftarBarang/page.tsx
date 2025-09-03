@@ -2,23 +2,24 @@
 import { Icon } from "@iconify/react";
 import Image, { StaticImageData } from "next/image";
 import dummyImage from "../assets/dummy.jpg";
-import { Badge } from "@/components/ui/badge";
-import Logo from "../assets/image.png";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import {
-	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerDescription,
-	DrawerFooter,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerTrigger,
-} from "@/components/ui/drawer";
+	Sheet,
+	SheetClose,
+	SheetContent,
+	SheetDescription,
+	SheetFooter,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from "@/components/ui/sheet";
 
 import { B_Search } from "./Binary-Search";
 import { EnhancedSearch } from "@/components/search";
@@ -66,7 +67,7 @@ export default function DaftarBarang() {
 
 	// HOOKS FOR SEARCH
 	// const [searchValue, setSearchValue] = useState<string>("");
-	const [dataFound, setDataFound] = useState<DataBarangType[] | null>();
+	const [dataFound, setDataFound] = useState<number | DataBarangType[] | null>(null);
 	const [isFound, setIsFound] = useState<boolean>(false);
 
 	interface DataBarangType {
@@ -223,13 +224,11 @@ export default function DaftarBarang() {
 			return;
 		}
 
-		const result: DataBarangType[] | null = B_Search(
-			SortedBarangAZ,
-			searchValue
-		);
-		if (result === undefined) return;
+		const result: (DataBarangType & {
+			index: number;
+		})[] | null = B_Search(SortedBarangAZ, searchValue);
+		if (result === null) return;
 		setDataFound(result);
-		setIsFound(true);
 
 		console.log(result);
 	};
@@ -237,41 +236,36 @@ export default function DaftarBarang() {
 	const handleReset = () => {
 		// setSearchValue("");
 		setIsFound(false);
-		setDataFound(null);
+		setDataFound([]);
 		return;
 	};
 
-	const handleCardSignal = (pesan: string, ok: boolean) => { 
-		
+	const handleCardSignal = (pesan: string, ok: boolean) => {
+		toast(pesan, {
+			icon: ok ? (
+				<Icon
+					icon='teenyicons:tick-circle-outline'
+					width='15'
+					height='15'
+				/>
+			) : (
+				<Icon
+					icon='f7:exclamationmark'
+					width='56'
+					height='56'
+				/>
+			),
+			duration: 2000,
+			position: "bottom-center",
+			richColors: true,
+		});
 	};
 
 	return (
 		<>
 			<div className='fixed top-0 left-0 right-0 z-50 bg-white shadow-md'>
-				<div className='navbar'>
-					<div className='logoTitle flex-col flex gap-2 py-5 px-10'>
-						<div className='title flex items-center gap-3'>
-							<Image
-								src={Logo || "/placeholder.svg"}
-								alt='Company Logo'
-								height={80}
-								width={80}
-							/>
-							<h1 className='text-black text-5xl font-bold flex items-center gap-2'>
-								SILAHKAN, SELAMAT MEMINJAM {session?.user?.name?.toUpperCase()}
-								{/* sementara tombol logout nya disimpan disini dulu */}
-								<Button
-									className='ml-2 bg-[#8b3412]'
-									variant='default'
-									size='sm'
-									onClick={() => signOut()}>
-									Logout
-								</Button>
-							</h1>
-						</div>
-						<h2 className='text-black text-3xl'>Peminjaman Barang Gudang</h2>
-					</div>
-					<div className='searchMenu flex px-10 items-center justify-between pb-4'>
+				<div className='navbar flex items-center justify-center py-4'>
+					<div className='searchMenu flex items-center justify-center gap-15'>
 						<div className='search flex w-full max-w-lg pr-2'>
 							<EnhancedSearch
 								placeholder='Mangga cari barang disini'
@@ -280,6 +274,8 @@ export default function DaftarBarang() {
 								className='w-full'
 							/>
 						</div>
+
+						{/* kategori */}
 						<div className='menu flex gap-5'>
 							<div className='kategori'>
 								<ul className='flex text-black gap-5'>
@@ -312,10 +308,10 @@ export default function DaftarBarang() {
 								</ul>
 							</div>
 
-							{/* KERANGJANG DRAWER */}
+							{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
 							<div className='pinjam'>
-								<Drawer>
-									<DrawerTrigger asChild>
+								<Sheet>
+									<SheetTrigger asChild>
 										<Button variant='outline'>
 											<Icon
 												icon='fluent-mdl2:work-item'
@@ -324,37 +320,54 @@ export default function DaftarBarang() {
 												style={{ color: "#000" }}
 											/>
 										</Button>
-									</DrawerTrigger>
+									</SheetTrigger>
 
-									<DrawerContent>
-										<DrawerHeader>
-											<DrawerTitle>Are you absolutely sure?</DrawerTitle>
-											<DrawerDescription>
-												This action cannot be undone.
-											</DrawerDescription>
-										</DrawerHeader>
-										<DrawerFooter className='flex gap-2'>
-											<DrawerClose asChild>
-												<Button
-													variant='outline'
-													size='sm'>
-													Cancel
-												</Button>
-											</DrawerClose>
-										</DrawerFooter>
-									</DrawerContent>
-								</Drawer>
+									<SheetContent>
+										<SheetHeader>
+											<SheetTitle className='text-green-500 text-2xl'>
+												Keranjang
+											</SheetTitle>
+											<SheetDescription>
+												Daftar belanjaan kamu nih...
+											</SheetDescription>
+										</SheetHeader>
+
+										<div className='grid flex-1 auto-rows-min gap-6 px-4'>
+											<div className='grid gap-3'>
+												<Label htmlFor='sheet-demo-name'>Name</Label>
+												<Input
+													id='sheet-demo-name'
+													defaultValue='Pedro Duarte'
+												/>
+											</div>
+											<div className='grid gap-3'>
+												<Label htmlFor='sheet-demo-username'>Username</Label>
+												<Input
+													id='sheet-demo-username'
+													defaultValue='@peduarte'
+												/>
+											</div>
+										</div>
+
+										<SheetFooter>
+											<Button type='submit'>Save changes</Button>
+											<SheetClose asChild>
+												<Button variant='outline'>Close</Button>
+											</SheetClose>
+										</SheetFooter>
+									</SheetContent>
+								</Sheet>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div className='DaftarBarang flex flex-col gap-4 pt-[280px]'>
+			<div className='DaftarBarang flex flex-col gap-4 py-20'>
 				<div className='dataBarang flex flex-col'>
-					<div className='daftarBaran flex flex-wrap shrink-0 gap-10 justify-center items-center'>
+					<div className='daftarBaran flex flex-wrap shrink-0 gap-10 justify-center'>
 						{/* Badge */}
-						<div className='flex gap-2'>
+						{/* <div className='flex gap-2 pt-10'>
 							{selectedCategory.map((category) => (
 								<Badge
 									key={category}
@@ -362,30 +375,42 @@ export default function DaftarBarang() {
 									{category}
 								</Badge>
 							))}
-						</div>
+						</div> */}
 
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
 							{isFound &&
-								dataFound?.map((item) => {
-									return <div key={item.id}>
-										<CardViews item={item} signalFromCard={handleCardSignal}></CardViews>
-									</div>;
-								})}
+								Array.isArray(dataFound) &&
+								dataFound.map((item) => (
+									<div key={item.id}>
+										<CardViews
+											item={item}
+											signalFromCard={handleCardSignal}
+										/>
+									</div>
+								))}
 
 							{!isFound &&
 								DataBarang.map((item) => {
 									if (selectedCategory.length === 0) {
-										return <div key={item.id}>
-											<CardViews item={item}></CardViews>
-										</div>;
+										return (
+											<div key={item.id}>
+												<CardViews
+													item={item}
+													signalFromCard={handleCardSignal}></CardViews>
+											</div>
+										);
 									}
 									if (
 										selectedCategory.length > 0 &&
 										selectedCategory.includes(item.kategori)
 									) {
-										return <div key={item.id}>
-											<CardViews item={item}></CardViews>
-										</div>;
+										return (
+											<div key={item.id}>
+												<CardViews
+													item={item}
+													signalFromCard={handleCardSignal}></CardViews>
+											</div>
+										);
 									}
 									return null;
 								})}
