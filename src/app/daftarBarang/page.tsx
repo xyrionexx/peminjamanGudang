@@ -11,6 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import {
 	Sheet,
 	SheetClose,
 	SheetContent,
@@ -25,6 +31,7 @@ import { B_Search } from "./Binary-Search";
 import { EnhancedSearch } from "@/components/search";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
+import type { DataBarangType } from "@/types/global";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
@@ -66,18 +73,10 @@ export default function DaftarBarang() {
 	);
 
 	// HOOKS FOR SEARCH
-	// const [searchValue, setSearchValue] = useState<string>("");
-	const [dataFound, setDataFound] = useState<number | DataBarangType[] | null>(null);
+	const [dataFound, setDataFound] = useState<number | DataBarangType[] | null>(
+		null
+	);
 	const [isFound, setIsFound] = useState<boolean>(false);
-
-	interface DataBarangType {
-		id: number;
-		gambar: StaticImageData;
-		nama: string;
-		desc: string;
-		stok: number;
-		kategori: string;
-	}
 
 	if (status === "loading") {
 		return loading_circle();
@@ -224,9 +223,11 @@ export default function DaftarBarang() {
 			return;
 		}
 
-		const result: (DataBarangType & {
-			index: number;
-		})[] | null = B_Search(SortedBarangAZ, searchValue);
+		const result:
+			| (DataBarangType & {
+					index: number;
+			  })[]
+			| null = B_Search(SortedBarangAZ, searchValue);
 		if (result === null) return;
 		setDataFound(result);
 
@@ -234,7 +235,6 @@ export default function DaftarBarang() {
 	};
 
 	const handleReset = () => {
-		// setSearchValue("");
 		setIsFound(false);
 		setDataFound([]);
 		return;
@@ -311,16 +311,24 @@ export default function DaftarBarang() {
 							{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
 							<div className='pinjam'>
 								<Sheet>
-									<SheetTrigger asChild>
-										<Button variant='outline'>
-											<Icon
-												icon='fluent-mdl2:work-item'
-												width='24'
-												height='24'
-												style={{ color: "#000" }}
-											/>
-										</Button>
-									</SheetTrigger>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<SheetTrigger asChild>
+												<Button variant='outline'>
+													<Icon
+														icon='fluent-mdl2:work-item'
+														width='24'
+														height='24'
+														style={{ color: "#000" }}
+													/>
+												</Button>
+											</SheetTrigger>
+										</TooltipTrigger>
+
+										<TooltipContent>
+											<p>Daftar belanjaan kamu ada disini nih...</p>
+										</TooltipContent>
+									</Tooltip>
 
 									<SheetContent>
 										<SheetHeader>

@@ -1,4 +1,5 @@
 import type { DataBarangType } from "@/types/global";
+
 import {
 	Card,
 	CardContent,
@@ -6,6 +7,8 @@ import {
 	CardTitle,
 	CardFooter,
 } from "@/components/ui/card";
+
+import { Icon } from "@iconify/react/dist/iconify.js";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { JSX, useRef, useState } from "react";
@@ -61,7 +64,10 @@ export default function CardViews({
 				a.nama.toLowerCase().localeCompare(b.nama.toLowerCase())
 			);
 
-			const hasil: (DataBarangType & {index: number})[] | null = B_Search(barang, nameItem);
+			const hasil: (DataBarangType & { index: number })[] | null = B_Search(
+				barang,
+				nameItem
+			);
 
 			if (hasil === null) return;
 			hasil.forEach((item) => {
@@ -125,6 +131,11 @@ export default function CardViews({
 				<Button
 					variant={"default"}
 					className='w-full bg-green-500 hover:bg-green-600 h-10 text-sm'>
+					<Icon
+						icon='material-symbols:shopping-bag-outline'
+						width='24'
+						height='24'
+					/>
 					Pesan sekarang
 				</Button>
 				<Button
@@ -143,6 +154,19 @@ export default function CardViews({
 							btn_data.dataset.mode = "add";
 						}
 					}}>
+					{btnRef.current?.dataset.mode === "remove" ? (
+						<Icon
+							icon='bi:cart-x'
+							width='16'
+							height='16'
+						/>
+					) : (
+						<Icon
+							icon='vaadin:cart-o'
+							width='16'
+							height='16'
+						/>
+					)}
 					{statusItemTxt}
 				</Button>
 			</CardFooter>
