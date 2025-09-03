@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import {
 	Tooltip,
 	TooltipContent,
@@ -265,7 +267,30 @@ export default function DaftarBarang() {
 		<>
 			<div className='fixed top-0 left-0 right-0 z-50 bg-white shadow-md'>
 				<div className='navbar flex items-center justify-center py-4'>
-					<div className='searchMenu flex items-center justify-center gap-15'>
+					<div className='searchMenu flex items-center justify-center gap-15 mx-auto'>
+						<div className='flex gap-3 justify-center items-center'>
+							<Avatar>
+								<AvatarImage
+									src={
+										session?.user.image ??
+										"https://avatar.iran.liara.run/public"
+									}
+								/>
+								<AvatarFallback>ID</AvatarFallback>
+							</Avatar>
+
+							<p className='flex shrink-0 whitespace-nowrap'>
+								{session?.user.name}
+							</p>
+
+							<Icon
+								icon='ep:arrow-down'
+								width='20'
+								height='20'
+								className="text-gray-500"
+							/>
+						</div>
+
 						<div className='search flex w-full max-w-lg pr-2'>
 							<EnhancedSearch
 								placeholder='Mangga cari barang disini'
