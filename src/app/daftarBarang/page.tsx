@@ -1,41 +1,25 @@
 "use client";
+
+// TOOLS
 import { Icon } from "@iconify/react";
-import Image, { StaticImageData } from "next/image";
-import dummyImage from "../assets/dummy.jpg";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+// SHADCN
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-
-import {
-	Sheet,
-	SheetClose,
-	SheetContent,
-	SheetDescription,
-	SheetFooter,
-	SheetHeader,
-	SheetTitle,
-	SheetTrigger,
-} from "@/components/ui/sheet";
-
 // IMPORT MILIK SENDIRI / KITA
+import dummyImage from "../assets/dummy.jpg";
 import { B_Search } from "./Binary-Search";
 import { EnhancedSearch } from "@/components/search";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
 import type { DataBarangType } from "@/types/global";
 import ProfileMenu from "@/components/ProfileMenu";
+import CartSidebarBtn from "@/components/CartSidebarBtn";
 
 export default function DaftarBarang() {
 	const { data: session, status } = useSession();
@@ -90,6 +74,7 @@ export default function DaftarBarang() {
 		router.push("/signin?callbackUrl=/daftarBarang");
 	}
 
+	// DATA BARANG TYPE
 	const DataBarang: DataBarangType[] = [
 		{
 			id: 1,
@@ -196,11 +181,11 @@ export default function DaftarBarang() {
 			kategori: "Peralatan Kantor",
 		},
 	];
-
 	const SortedBarangAZ: DataBarangType[] = DataBarang.sort((a, b) => {
 		return a.nama.toLowerCase().localeCompare(b.nama.toLowerCase());
 	});
 
+	// HANLDERS
 	const handleCategory = (category: { name: string; status: boolean }) => {
 		if (selectedCategory.includes(category.name)) {
 			setSelectedCategory((prev) =>
@@ -271,7 +256,7 @@ export default function DaftarBarang() {
 			{/* NAVBAR */}
 			<div className='fixed top-0 left-0 right-0 z-50 bg-white shadow-md'>
 				<div className='navbar flex items-center justify-center py-4'>
-					<div className='searchMenu flex items-center justify-center  mx-auto'>
+					<div className='searchMenu flex items-center justify-center mx-auto gap-5'>
 						{/* AVATAR */}
 						<div className='flex gap-3 justify-center items-center'>
 							<Avatar>
@@ -302,7 +287,7 @@ export default function DaftarBarang() {
 						</div>
 
 						{/* KATEGORI */}
-						<div className='menu flex gap-5'>
+						<div className='menu flex gap-5 items-center'>
 							<div className='kategori'>
 								<ul className='flex text-black gap-5'>
 									{/* TOMBOL RESET KATEGORI */}
@@ -338,48 +323,7 @@ export default function DaftarBarang() {
 
 							{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
 							<div className='pinjam'>
-								<Sheet>
-									{/* TRIGGER BUTTON */}
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<SheetTrigger asChild>
-												<Button variant='outline'>
-													<Icon
-														icon='fluent-mdl2:work-item'
-														width='24'
-														height='24'
-														style={{ color: "#000" }}
-													/>
-												</Button>
-											</SheetTrigger>
-										</TooltipTrigger>
-
-										<TooltipContent>
-											<p>Daftar belanjaan kamu ada disini nih...</p>
-										</TooltipContent>
-									</Tooltip>
-
-									{/* SIDE RIGHT BAR  / SHEET CONTENT */}
-									<SheetContent>
-										<SheetHeader>
-											<SheetTitle className='text-green-500 text-2xl flex items-center gap-2'>
-												Keranjang
-												<Icon
-													icon='vaadin:cart-o'
-													width='25'
-													height='25'
-												/>
-											</SheetTitle>
-											<SheetDescription>
-												Daftar belanjaan kamu nih...
-											</SheetDescription>
-										</SheetHeader>
-
-										<div className='flex mx-2'>
-											<EnhancedSearch />
-										</div>
-									</SheetContent>
-								</Sheet>
+								<CartSidebarBtn />
 							</div>
 						</div>
 					</div>

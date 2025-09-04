@@ -6,3 +6,10 @@ export interface DataBarangType {
 	stok: number;
 	kategori: string;
 }
+
+export interface BarangTransaksiType {
+	id: number;
+	nama_barang: string;
+	jumlah: number;
+	kategori: string;
+}

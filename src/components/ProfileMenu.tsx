@@ -16,13 +16,11 @@ export default function ProfileMenu() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
-				<Button variant={"ghost"}>
-					<Icon
-						icon='ep:arrow-down'
-						width='20'
-						height='20'
-					/>
-				</Button>
+				<Icon
+					icon='ep:arrow-down'
+					width='20'
+					height='20'
+				/>
 			</DropdownMenuTrigger>
 
 			<DropdownMenuContent>

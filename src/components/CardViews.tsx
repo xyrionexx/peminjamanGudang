@@ -20,6 +20,31 @@ type CardViewsProps = {
 	signalFromCard: (pesan: string, ok: boolean) => void;
 };
 
+export const handle_RemoveFromCart = (nameItem: string): void => {
+	try {
+		var barang: DataBarangType[] = JSON.parse(
+			localStorage.getItem("cart") ?? "[]"
+		);
+		barang = barang.sort((a, b) =>
+			a.nama.toLowerCase().localeCompare(b.nama.toLowerCase())
+		);
+
+		const hasil: (DataBarangType & { index: number })[] | null = B_Search(
+			barang,
+			nameItem
+		);
+
+		if (hasil === null) return;
+		hasil.forEach((item) => {
+			barang.splice(item.index, 1);
+		});
+
+		localStorage.setItem("cart", JSON.stringify(barang));
+	} catch (error) {
+		throw new Error("error nih");
+	}
+};
+
 export default function CardViews({
 	item,
 	signalFromCard,
@@ -55,28 +80,12 @@ export default function CardViews({
 		}
 	};
 
-	const handle_RemoveFromCart = (nameItem: string) => {
+	const itemRemoveHandler = (itemName: string): void => { 
 		try {
-			var barang: DataBarangType[] = JSON.parse(
-				localStorage.getItem("cart") ?? "[]"
-			);
-			barang = barang.sort((a, b) =>
-				a.nama.toLowerCase().localeCompare(b.nama.toLowerCase())
-			);
-
-			const hasil: (DataBarangType & { index: number })[] | null = B_Search(
-				barang,
-				nameItem
-			);
-
-			if (hasil === null) return;
-			hasil.forEach((item) => {
-				barang.splice(item.index, 1);
-			});
-
-			localStorage.setItem("cart", JSON.stringify(barang));
+			handle_RemoveFromCart(itemName);
+			signalFromCard("barang berhasil di buang dari keranjang", true);
 		} catch (error) {
-			signalFromCard("Barangnya ngga ada di keranjang ey", false);
+			signalFromCard("waduh ada yang error nih", false)
 		}
 	};
 
@@ -149,7 +158,7 @@ export default function CardViews({
 							setStatusItemTxt("Buang dari keranjang");
 							btn_data.dataset.mode = "remove";
 						} else {
-							handle_RemoveFromCart(item.nama);
+							itemRemoveHandler(item.nama);
 							setStatusItemTxt("Masukkin ke keranjang");
 							btn_data.dataset.mode = "add";
 						}

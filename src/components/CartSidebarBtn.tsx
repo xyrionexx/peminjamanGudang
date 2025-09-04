@@ -1,0 +1,115 @@
+// TOOLS
+import { useState } from "react";
+
+// SHADCN
+import {
+	Sheet,
+	SheetClose,
+	SheetContent,
+	SheetDescription,
+	SheetFooter,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from "@/components/ui/sheet";
+
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "./ui/button";
+
+// ICON
+import { Icon } from "@iconify/react/dist/iconify.js";
+
+// MILIK SENDIRI
+import { EnhancedSearch } from "./search";
+import { DataBarangType } from "@/types/global";
+import ItemCard from "./ItemCard";
+
+export default function CartSidebarBtn() {
+	const [barang, setBarang] = useState<
+		(DataBarangType & { index: number })[] | null
+	>(null);
+
+	const getBarangCart = () => {
+		try {
+			setBarang(JSON.parse(localStorage.getItem("cart") ?? "[]"));
+			console.log("test");
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	return (
+		<Sheet>
+			{/* TRIGGER BUTTON */}
+			<Tooltip>
+				<TooltipTrigger
+					asChild
+					className='cursor-pointer'
+					onMouseEnter={getBarangCart}
+				>
+					<SheetTrigger asChild>
+						<Icon
+							icon='fluent-mdl2:work-item'
+							width='20'
+							height='20'
+							style={{ color: "#000" }}
+						/>
+					</SheetTrigger>
+				</TooltipTrigger>
+
+				<TooltipContent>
+					<p>Daftar belanjaan kamu ada disini nih...</p>
+				</TooltipContent>
+			</Tooltip>
+
+			{/* SIDE RIGHT BAR  / SHEET CONTENT */}
+			<SheetContent>
+				<SheetHeader>
+					<SheetTitle className='text-green-500 text-2xl flex items-center gap-2'>
+						Keranjang
+						<Icon
+							icon='vaadin:cart-o'
+							width='25'
+							height='25'
+						/>
+					</SheetTitle>
+					<SheetDescription>Daftar belanjaan kamu nih...</SheetDescription>
+				</SheetHeader>
+
+				{/* CONTENT */}
+				<div className='flex mx-2 flex-col gap-5'>
+					{/* search */}
+					<div>
+						<EnhancedSearch />
+					</div>
+
+					{/* ITEM */}
+					<div className={`h-full max-h-full flex flex-col ${barang?.length === 0 ? "justify-center items-center" : ""}`}>
+						{barang?.length === 0 ? (
+							<span className="text-gray-400">Keranjang kamu kosong nih...</span>
+						) : (
+							barang?.map((item) => {
+								return (
+									<div key={item.id}>
+										<ItemCard barang={item} getBarang={getBarangCart} />
+									</div>
+								);
+							})
+						)}
+					</div>
+				</div>
+
+				<SheetFooter>
+					<Button className="bg-green-500">Order sekarang</Button>
+					<SheetClose asChild>
+						<Button variant={"outline"}>Nanti dulu, mau nyari yang lain dulu</Button>
+					</SheetClose>
+				</SheetFooter>
+			</SheetContent>
+		</Sheet>
+	);
+}
