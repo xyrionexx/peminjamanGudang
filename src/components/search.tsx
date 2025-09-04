@@ -38,7 +38,6 @@ export function EnhancedSearch({
 
 	const handleKeyDown = (event: React.KeyboardEvent) => {
 		if (event.key === "Enter") {
-			debugger;
 			handleSearch();
 		}
 		if (event.key === "Escape") {

@@ -17,7 +17,7 @@ import { B_Search } from "./Binary-Search";
 import { EnhancedSearch } from "@/components/search";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
-import type { DataBarangType } from "@/types/global";
+import type { DataBarangType, FoundBarang } from "@/types/global";
 import ProfileMenu from "@/components/ProfileMenu";
 import CartSidebarBtn from "@/components/CartSidebarBtn";
 
@@ -206,18 +206,13 @@ export default function DaftarBarang() {
 	};
 
 	const handleSearch = (searchValue: string): void => {
-		debugger;
 		if (searchValue.length === 0) {
 			setIsFound(false);
 			setDataFound(null);
 			return;
 		}
 
-		const result:
-			| (DataBarangType & {
-					index: number;
-			  })[]
-			| null = B_Search(SortedBarangAZ, searchValue);
+		const result: FoundBarang[] | null = B_Search(SortedBarangAZ, searchValue);
 		if (result === null) return;
 		setDataFound(result);
 		setIsFound(true);

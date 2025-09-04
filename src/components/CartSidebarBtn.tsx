@@ -25,13 +25,12 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 
 // MILIK SENDIRI
 import { EnhancedSearch } from "./search";
-import { DataBarangType } from "@/types/global";
+import { DataBarangType, FoundBarang } from "@/types/global";
 import ItemCard from "./ItemCard";
+import { B_Search } from "@/app/daftarBarang/Binary-Search";
 
 export default function CartSidebarBtn() {
-	const [barang, setBarang] = useState<
-		(DataBarangType & { index: number })[] | null
-	>(null);
+	const [barang, setBarang] = useState<FoundBarang[] | null>(null);
 
 	const getBarangCart = () => {
 		try {
@@ -42,6 +41,14 @@ export default function CartSidebarBtn() {
 		}
 	};
 
+	const handleSearch = (searchvalue: string) => {
+		const result: FoundBarang[] | null = B_Search(
+			barang as DataBarangType[],
+			searchvalue
+		);
+		if (result === null) return;
+	};
+
 	return (
 		<Sheet>
 			{/* TRIGGER BUTTON */}
@@ -49,8 +56,7 @@ export default function CartSidebarBtn() {
 				<TooltipTrigger
 					asChild
 					className='cursor-pointer'
-					onMouseEnter={getBarangCart}
-				>
+					onMouseEnter={getBarangCart}>
 					<SheetTrigger asChild>
 						<Icon
 							icon='fluent-mdl2:work-item'
@@ -84,18 +90,26 @@ export default function CartSidebarBtn() {
 				<div className='flex mx-2 flex-col gap-5'>
 					{/* search */}
 					<div>
-						<EnhancedSearch />
+						<EnhancedSearch onSearch={handleSearch} />
 					</div>
 
 					{/* ITEM */}
-					<div className={`h-full max-h-full flex flex-col ${barang?.length === 0 ? "justify-center items-center" : ""}`}>
+					<div
+						className={`h-full max-h-full flex flex-col ${
+							barang?.length === 0 ? "justify-center items-center" : ""
+						}`}>
 						{barang?.length === 0 ? (
-							<span className="text-gray-400">Keranjang kamu kosong nih...</span>
+							<span className='text-gray-400'>
+								Keranjang kamu kosong nih...
+							</span>
 						) : (
 							barang?.map((item) => {
 								return (
 									<div key={item.id}>
-										<ItemCard barang={item} getBarang={getBarangCart} />
+										<ItemCard
+											barang={item}
+											getBarang={getBarangCart}
+										/>
 									</div>
 								);
 							})
@@ -104,9 +118,11 @@ export default function CartSidebarBtn() {
 				</div>
 
 				<SheetFooter>
-					<Button className="bg-green-500">Order sekarang</Button>
+					<Button className='bg-green-500'>Order sekarang</Button>
 					<SheetClose asChild>
-						<Button variant={"outline"}>Nanti dulu, mau nyari yang lain dulu</Button>
+						<Button variant={"outline"}>
+							Nanti dulu, mau nyari yang lain dulu
+						</Button>
 					</SheetClose>
 				</SheetFooter>
 			</SheetContent>

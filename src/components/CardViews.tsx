@@ -1,4 +1,4 @@
-import type { DataBarangType } from "@/types/global";
+import type { DataBarangType, FoundBarang } from "@/types/global";
 
 import {
 	Card,
@@ -29,7 +29,7 @@ export const handle_RemoveFromCart = (nameItem: string): void => {
 			a.nama.toLowerCase().localeCompare(b.nama.toLowerCase())
 		);
 
-		const hasil: (DataBarangType & { index: number })[] | null = B_Search(
+		const hasil: FoundBarang[] | null = B_Search(
 			barang,
 			nameItem
 		);
