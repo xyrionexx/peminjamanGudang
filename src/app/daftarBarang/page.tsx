@@ -22,6 +22,7 @@ import ProfileMenu from "@/components/ProfileMenu";
 import CartSidebarBtn from "@/components/CartSidebarBtn";
 
 export default function DaftarBarang() {
+	// ANOTHER HOOK TOOLS
 	const { data: session, status } = useSession();
 	const router = useRouter();
 
@@ -66,10 +67,10 @@ export default function DaftarBarang() {
 	);
 	const [isFound, setIsFound] = useState<boolean>(false);
 
+	// ACCOUNT LOG IN / LOG OUT VALIDATION
 	if (status === "loading") {
 		return loading_circle();
 	}
-
 	if (status === "unauthenticated") {
 		router.push("/signin?callbackUrl=/daftarBarang");
 	}

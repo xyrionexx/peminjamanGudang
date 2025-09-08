@@ -31,22 +31,36 @@ import { B_Search } from "@/app/daftarBarang/Binary-Search";
 
 export default function CartSidebarBtn() {
 	const [barang, setBarang] = useState<FoundBarang[] | null>(null);
+	const [BarangFound, setBarangFound] = useState<FoundBarang[] | null>(null);
 
 	const getBarangCart = () => {
 		try {
-			setBarang(JSON.parse(localStorage.getItem("cart") ?? "[]"));
-			console.log("test");
+			const item: FoundBarang[] | null = JSON.parse(
+				localStorage.getItem("cart") ?? "[]"
+			);
+
+			if (item === null) return;
+			item.sort((a, b) => {
+				return a.nama.toLowerCase().localeCompare(b.nama.toLowerCase());
+			});
+			setBarang(item);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
-	const handleSearch = (searchvalue: string) => {
+	const handleSearch = (searchvalue: string): void => {
 		const result: FoundBarang[] | null = B_Search(
 			barang as DataBarangType[],
 			searchvalue
 		);
+
 		if (result === null) return;
+		setBarangFound(result);
+	};
+
+	const handleReset = () => {
+		setBarangFound(null);
 	};
 
 	return (
@@ -90,7 +104,10 @@ export default function CartSidebarBtn() {
 				<div className='flex mx-2 flex-col gap-5'>
 					{/* search */}
 					<div>
-						<EnhancedSearch onSearch={handleSearch} />
+						<EnhancedSearch
+							onSearch={handleSearch}
+							onReset={handleReset}
+						/>
 					</div>
 
 					{/* ITEM */}
@@ -98,7 +115,18 @@ export default function CartSidebarBtn() {
 						className={`h-full max-h-full flex flex-col ${
 							barang?.length === 0 ? "justify-center items-center" : ""
 						}`}>
-						{barang?.length === 0 ? (
+						{(BarangFound ?? []).length > 0 ? (
+							BarangFound!.map((item) => {
+								return (
+									<div key={item.id}>
+										<ItemCard
+											barang={item}
+											getBarang={getBarangCart}
+										/>
+									</div>
+								);
+							})
+						) : barang?.length === 0 ? (
 							<span className='text-gray-400'>
 								Keranjang kamu kosong nih...
 							</span>
