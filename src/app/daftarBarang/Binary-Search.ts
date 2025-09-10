@@ -13,7 +13,7 @@ export function B_Search(daftarBarang: DataBarangType[], input: string) {
 	let middle: number = count_mid(low, high);
 
 	let itemFounded: DataBarangType[] = [];
-	let itemFoundedFix: (DataBarangType & {index: number})[] = [];
+	let itemFoundedFix: (DataBarangType & {index?: number})[] = [];
 
 	while (low <= high) {
 		const hasil: number = lowerInput.localeCompare(

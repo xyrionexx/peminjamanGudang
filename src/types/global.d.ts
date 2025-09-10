@@ -14,4 +14,4 @@ export interface BarangTransaksiType {
 	kategori: string;
 }
 
-export type FoundBarang = DataBarangType & { index: number };
+export type FoundBarang = DataBarangType & { index?: number, addedToCart?: boolean };

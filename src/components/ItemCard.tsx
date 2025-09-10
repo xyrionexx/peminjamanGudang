@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { DataBarangType } from "@/types/global";
+import { DataBarangType, FoundBarang } from "@/types/global";
 import { Icon } from "@iconify/react";
 import { handle_RemoveFromCart } from "./CardViews";
 
 type itemTypeProps = {
-	barang: DataBarangType & { index: number };
+	barang: FoundBarang;
 	getBarang: () => void;
 }
 

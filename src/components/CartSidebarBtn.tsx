@@ -1,5 +1,5 @@
 // TOOLS
-import { useState } from "react";
+import { JSX, useState } from "react";
 
 // SHADCN
 import {
@@ -29,7 +29,13 @@ import { DataBarangType, FoundBarang } from "@/types/global";
 import ItemCard from "./ItemCard";
 import { B_Search } from "@/app/daftarBarang/Binary-Search";
 
-export default function CartSidebarBtn() {
+type CartSidebarBtnTypeProps = {
+	updateCart?: () => void;
+}
+
+export default function CartSidebarBtn({
+	updateCart
+}: CartSidebarBtnTypeProps): JSX.Element {
 	const [barang, setBarang] = useState<FoundBarang[] | null>(null);
 	const [BarangFound, setBarangFound] = useState<FoundBarang[] | null>(null);
 
@@ -148,7 +154,7 @@ export default function CartSidebarBtn() {
 				<SheetFooter>
 					<Button className='bg-green-500'>Order sekarang</Button>
 					<SheetClose asChild>
-						<Button variant={"outline"}>
+						<Button variant={"outline"} onClick={() => updateCart?.()}>
 							Nanti dulu, mau nyari yang lain dulu
 						</Button>
 					</SheetClose>

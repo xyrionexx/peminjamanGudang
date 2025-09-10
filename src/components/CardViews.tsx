@@ -1,3 +1,5 @@
+"use client";
+
 import type { DataBarangType, FoundBarang } from "@/types/global";
 
 import {
@@ -11,16 +13,18 @@ import {
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { JSX, useRef, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { B_Search } from "@/app/daftarBarang/Binary-Search";
+import { insertBarangEvent } from "./LocalStorageEvent";
 
 type CardViewsProps = {
-	item: DataBarangType | null;
+	item: FoundBarang | null;
+	itemFromCart?: FoundBarang | null;
 	signalFromCard: (pesan: string, ok: boolean) => void;
 };
 
-export const handle_RemoveFromCart = (nameItem: string): void => {
+export const handle_RemoveFromCart = (nameItem: string): boolean => {
 	try {
 		var barang: DataBarangType[] = JSON.parse(
 			localStorage.getItem("cart") ?? "[]"
@@ -29,17 +33,17 @@ export const handle_RemoveFromCart = (nameItem: string): void => {
 			a.nama.toLowerCase().localeCompare(b.nama.toLowerCase())
 		);
 
-		const hasil: FoundBarang[] | null = B_Search(
-			barang,
-			nameItem
-		);
+		const hasil: FoundBarang[] | null = B_Search(barang, nameItem);
 
-		if (hasil === null) return;
+		if (hasil === null) return false;
 		hasil.forEach((item) => {
+			if (item?.index == null) return;
 			barang.splice(item.index, 1);
 		});
 
 		localStorage.setItem("cart", JSON.stringify(barang));
+		insertBarangEvent("cart", barang);
+		return true;
 	} catch (error) {
 		throw new Error("error nih");
 	}
@@ -47,12 +51,13 @@ export const handle_RemoveFromCart = (nameItem: string): void => {
 
 export default function CardViews({
 	item,
+	itemFromCart,
 	signalFromCard,
 }: CardViewsProps): JSX.Element {
+	// TRACKERS
 	const [statusItemTxt, setStatusItemTxt] = useState<
 		"Masukkin ke keranjang" | "Buang dari keranjang"
-	>("Masukkin ke keranjang");
-	const btnRef = useRef<HTMLButtonElement>(null);
+		>("Masukkin ke keranjang");
 
 	// CHECK WHETHER THE BOTH OF DATA IS EXIST OR NOT
 	if (!item) {
@@ -65,14 +70,15 @@ export default function CardViews({
 		);
 	}
 
+	// HANDLERS
 	const handle_AddToCart = (item: DataBarangType): void => {
 		try {
-			var barang: DataBarangType[] = JSON.parse(
+			var barang: FoundBarang[] = JSON.parse(
 				localStorage.getItem("cart") ?? "[]"
 			);
-			barang.push(item);
+			barang.push({ ...item, addedToCart: true });
 			localStorage.setItem("cart", JSON.stringify(barang));
-
+			insertBarangEvent("cart", barang);
 			signalFromCard?.("Barang berhasil dimasukkan ke keranjang", true);
 		} catch (error) {
 			console.log("gagal menyimpan barang", error);
@@ -80,12 +86,12 @@ export default function CardViews({
 		}
 	};
 
-	const itemRemoveHandler = (itemName: string): void => { 
+	const itemRemoveHandler = (itemName: string): void => {
 		try {
 			handle_RemoveFromCart(itemName);
 			signalFromCard("barang berhasil di buang dari keranjang", true);
 		} catch (error) {
-			signalFromCard("waduh ada yang error nih", false)
+			signalFromCard("waduh ada yang error nih", false);
 		}
 	};
 
@@ -148,35 +154,42 @@ export default function CardViews({
 					Pesan sekarang
 				</Button>
 				<Button
-					ref={btnRef}
 					variant={"outline"}
 					className='w-full border-green-500 text-green-500 hover:bg-green-50 h-10 text-sm'
-					onClick={(event) => {
-						const btn_data = event.currentTarget;
-						if (!btn_data.dataset.mode || btn_data.dataset.mode === "add") {
-							handle_AddToCart(item);
-							setStatusItemTxt("Buang dari keranjang");
-							btn_data.dataset.mode = "remove";
+					onClick={() => {
+						if (itemFromCart?.addedToCart) {
+							const result: boolean = handle_RemoveFromCart(item.nama);
+							if (result) {
+								signalFromCard("berhasil buang barang dari keranjang!", true);
+							} else {
+								signalFromCard(
+									"aduhhh... kebelet eek",
+									false
+								);
+							}
 						} else {
-							itemRemoveHandler(item.nama);
-							setStatusItemTxt("Masukkin ke keranjang");
-							btn_data.dataset.mode = "add";
+							handle_AddToCart(item);
 						}
 					}}>
-					{btnRef.current?.dataset.mode === "remove" ? (
-						<Icon
-							icon='bi:cart-x'
-							width='16'
-							height='16'
-						/>
+					{itemFromCart?.addedToCart ? (
+						<div className='flex flex-row gap-2'>
+							<Icon
+								icon='pepicons-pop:cart-off'
+								width='20'
+								height='20'
+							/>
+							<p>Buang dari keranjang</p>
+						</div>
 					) : (
-						<Icon
-							icon='vaadin:cart-o'
-							width='16'
-							height='16'
-						/>
+						<div className='flex flex-row gap-2'>
+							<Icon
+								icon='ion:cart-outline'
+								width='512'
+								height='512'
+							/>
+							<p>Masukkan ke keranjang</p>
+						</div>
 					)}
-					{statusItemTxt}
 				</Button>
 			</CardFooter>
 		</Card>

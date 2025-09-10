@@ -4,7 +4,7 @@
 import { Icon } from "@iconify/react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // SHADCN
 import { toast } from "sonner";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // IMPORT MILIK SENDIRI / KITA
-import dummyImage from "../assets/dummy.jpg";
+import { DataBarang } from "./dummyData";
 import { B_Search } from "./Binary-Search";
 import { EnhancedSearch } from "@/components/search";
 import CardViews from "@/components/CardViews";
@@ -20,6 +20,27 @@ import { loading_circle } from "@/components/Loading";
 import type { DataBarangType, FoundBarang } from "@/types/global";
 import ProfileMenu from "@/components/ProfileMenu";
 import CartSidebarBtn from "@/components/CartSidebarBtn";
+
+type cartEventTypes = {
+	key: string;
+	newValue: FoundBarang[];
+};
+
+export const getBarangKeranjang = (): Map<number, FoundBarang> | null => {
+	if (typeof window === "undefined") return null;
+
+	const barangKeranjang: FoundBarang[] | null = JSON.parse(
+		localStorage.getItem("cart") ?? "[]"
+	);
+
+	if (barangKeranjang === null) {
+		return null;
+	}
+
+	return new Map(
+		barangKeranjang?.map((barang: FoundBarang) => [barang.id, barang])
+	);
+};
 
 export default function DaftarBarang() {
 	// ANOTHER HOOK TOOLS
@@ -61,11 +82,40 @@ export default function DaftarBarang() {
 		]
 	);
 
-	// HOOKS FOR SEARCH
+	// HOOKS FOR SEARCH RESULT
 	const [dataFound, setDataFound] = useState<number | DataBarangType[] | null>(
 		null
 	);
 	const [isFound, setIsFound] = useState<boolean>(false);
+
+	// HOOKS FOR CART / KERANJANG
+	const [barangKeranjang, setBarangKeranjang] = useState<Map<
+		number,
+		FoundBarang
+	> | null>();
+
+	// HOOK HANDLERS
+	useEffect(() => {
+		// AMBIL BARANG DARI KERANJANG
+		setBarangKeranjang(getBarangKeranjang());
+	}, []);
+
+	useEffect(() => {
+		// NANGKEP EVENT KETIKA HABIS MASUKAN BARANG KE KERANJANG
+		window.addEventListener("cartUpdate", (event: Event) => {
+			const customEvent = event as CustomEvent<cartEventTypes>;
+			if (customEvent.detail.key === "cart") {
+				setBarangKeranjang(
+					new Map(
+						customEvent.detail.newValue.map((barang: FoundBarang) => [
+							barang.id,
+							barang,
+						])
+					)
+				);
+			}
+		});
+	});
 
 	// ACCOUNT LOG IN / LOG OUT VALIDATION
 	if (status === "loading") {
@@ -75,113 +125,7 @@ export default function DaftarBarang() {
 		router.push("/signin?callbackUrl=/daftarBarang");
 	}
 
-	// DATA BARANG TYPE
-	const DataBarang: DataBarangType[] = [
-		{
-			id: 1,
-			gambar: dummyImage,
-			nama: "Proyektor",
-			desc: "Proyektor berkualitas tinggi untuk presentasi dan menonton film.",
-			stok: 24,
-			kategori: "Elektronik",
-		},
-		{
-			id: 2,
-			gambar: dummyImage,
-			nama: "Speaker",
-			desc: "Speaker portabel dengan suara jernih dan bass mantap.",
-			stok: 12,
-			kategori: "Audio",
-		},
-		{
-			id: 3,
-			gambar: dummyImage,
-			nama: "Laptop",
-			desc: "Laptop performa tinggi untuk kerja dan gaming ringan.",
-			stok: 15,
-			kategori: "Komputer",
-		},
-		{
-			id: 4,
-			gambar: dummyImage,
-			nama: "Mikrofon",
-			desc: "Mikrofon kondensor dengan kualitas audio profesional.",
-			stok: 30,
-			kategori: "Audio",
-		},
-		{
-			id: 5,
-			gambar: dummyImage,
-			nama: "Kamera DSLR",
-			desc: "Kamera DSLR dengan lensa kit untuk fotografi dan video.",
-			stok: 8,
-			kategori: "Fotografi",
-		},
-		{
-			id: 6,
-			gambar: dummyImage,
-			nama: "Tripod",
-			desc: "Tripod aluminium ringan untuk kamera dan smartphone.",
-			stok: 18,
-			kategori: "Aksesoris",
-		},
-		{
-			id: 7,
-			gambar: dummyImage,
-			nama: "Monitor LED",
-			desc: "Monitor Full HD dengan warna tajam dan refresh rate tinggi.",
-			stok: 10,
-			kategori: "Komputer",
-		},
-		{
-			id: 8,
-			gambar: dummyImage,
-			nama: "Printer",
-			desc: "Printer multifungsi untuk cetak, scan, dan fotokopi.",
-			stok: 6,
-			kategori: "Peralatan Kantor",
-		},
-		{
-			id: 9,
-			gambar: dummyImage,
-			nama: "Scanner",
-			desc: "Scanner dokumen resolusi tinggi untuk kebutuhan kantor.",
-			stok: 5,
-			kategori: "Peralatan Kantor",
-		},
-		{
-			id: 10,
-			gambar: dummyImage,
-			nama: "Whiteboard",
-			desc: "Whiteboard magnetik untuk presentasi dan brainstorming.",
-			stok: 7,
-			kategori: "Peralatan Kantor",
-		},
-		{
-			id: 11,
-			gambar: dummyImage,
-			nama: "Monitor AMOLED",
-			desc: "Monitor 4k dengan warna tajam dan refresh rate tinggi.",
-			stok: 10,
-			kategori: "Komputer",
-		},
-		{
-			id: 12,
-			gambar: dummyImage,
-			nama: "Kamera Mirrorless",
-			desc: "ya begitulah",
-			stok: 15,
-			kategori: "Fotografi",
-		},
-		{
-			id: 13,
-			gambar: dummyImage,
-			nama: "blackboard",
-			desc: "blackboard magnetik untuk presentasi dan brainstorming.",
-			stok: 7,
-			kategori: "Peralatan Kantor",
-		},
-	];
+	// DATA BARANG SORTED VERSION
 	const SortedBarangAZ: DataBarangType[] = DataBarang.sort((a, b) => {
 		return a.nama.toLowerCase().localeCompare(b.nama.toLowerCase());
 	});
@@ -195,7 +139,6 @@ export default function DaftarBarang() {
 		} else {
 			setSelectedCategory((prev) => [...prev, category.name]);
 		}
-
 		category.status = !category.status;
 	};
 
@@ -245,6 +188,10 @@ export default function DaftarBarang() {
 			position: "bottom-center",
 			richColors: true,
 		});
+	};
+
+	const handleUpdateCart = () => {
+		setBarangKeranjang(getBarangKeranjang());
 	};
 
 	return (
@@ -319,7 +266,7 @@ export default function DaftarBarang() {
 
 							{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
 							<div className='pinjam'>
-								<CartSidebarBtn />
+								<CartSidebarBtn updateCart={handleUpdateCart} />
 							</div>
 						</div>
 					</div>
@@ -333,22 +280,24 @@ export default function DaftarBarang() {
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
 							{isFound &&
 								Array.isArray(dataFound) &&
-								dataFound.map((item) => (
+								dataFound.map((item, index) => (
 									<div key={item.id}>
 										<CardViews
 											item={item}
+											itemFromCart={barangKeranjang?.get(index)}
 											signalFromCard={handleCardSignal}
 										/>
 									</div>
 								))}
 
 							{!isFound &&
-								DataBarang.map((item) => {
+								DataBarang.map((item, index) => {
 									if (selectedCategory.length === 0) {
 										return (
 											<div key={item.id}>
 												<CardViews
 													item={item}
+													itemFromCart={barangKeranjang?.get(item.id)}
 													signalFromCard={handleCardSignal}></CardViews>
 											</div>
 										);
@@ -361,6 +310,7 @@ export default function DaftarBarang() {
 											<div key={item.id}>
 												<CardViews
 													item={item}
+													itemFromCart={barangKeranjang?.get(index)}
 													signalFromCard={handleCardSignal}></CardViews>
 											</div>
 										);
