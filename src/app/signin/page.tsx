@@ -1,15 +1,16 @@
 "use client";
 
+// REACT IMPORTS
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Github, Chrome, Loader2 } from "lucide-react";
+import { Github, Chrome } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
 
 export default function Signin() {
-	const { status } = useSession();
-	const router = useRouter();
+	// HOOKS
+	const { status } = useSession(); // SESSION HOOK
 
+	// USER VALIDATOR
 	if (status === "loading") {
 		return (
 			<div className='flex items-center justify-center min-h-[200px]'>
@@ -38,6 +39,7 @@ export default function Signin() {
 		);
 	}
 
+	// HANDLERS
 	const callbackURL = () => {
 		const fullUrl = new URL(window.location.href);
 		const urlParam = new URLSearchParams(fullUrl.search);
@@ -47,13 +49,17 @@ export default function Signin() {
 	return (
 		<div className='min-h-screen flex items-center justify-center bg-gray-50 px-4'>
 			<div className='w-full max-w-md bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col gap-5'>
+				{/* TITLE */}
 				<div className='p-6 text-center border-b border-gray-100'>
 					<h1 className='text-2xl font-bold text-gray-900 mb-2'>Sign In</h1>
 					<p className='text-gray-600 text-sm'>
 						Choose your preferred sign-in method to continue
 					</p>
 				</div>
+
+				{/* SIGN BUTTON OPTION */}
 				<div className='p-6 space-y-4'>
+					{/* GOOGLE */}
 					<button
 						onClick={() =>
 							signIn("google", { callbackUrl: callbackURL(), prompt: "login" })
@@ -62,6 +68,8 @@ export default function Signin() {
 						<Chrome className='h-5 w-5' />
 						Sign in with Google
 					</button>
+
+					{/* GITHUB */}
 					<button
 						onClick={() =>
 							signIn("github", { callbackUrl: callbackURL(), prompt: "login" })
@@ -72,6 +80,7 @@ export default function Signin() {
 					</button>
 				</div>
 
+				{/* BACK TO HOME LINK */}
 				<div className='flex justify-center border-t border-gray-200 pt-5'>
 					<Link href="/" className="text-[#41218b] text-center font-semibold mb-5">Back to home</Link>
 				</div>

@@ -11,7 +11,7 @@ export class Penyimpanan {
 		this.rakPalingAkhir = rakPalingAkhir;
 	}
 
-	cari(penyimpanan: Penyimpanan, input: string): DataBarangType | null {
+	cari(penyimpanan: Penyimpanan, input: string): DataBarangType | null | undefined {
 		let index = 0;
 
 		while (

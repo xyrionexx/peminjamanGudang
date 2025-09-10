@@ -1,7 +1,6 @@
 "use client";
 
-import type { DataBarangType, FoundBarang } from "@/types/global";
-
+// SHADCN
 import {
 	Card,
 	CardContent,
@@ -9,21 +8,29 @@ import {
 	CardTitle,
 	CardFooter,
 } from "@/components/ui/card";
+import { Button } from "./ui/button";
 
+// REACT IMPORTS
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { JSX, useEffect, useRef, useState } from "react";
-import { Button } from "./ui/button";
-import { B_Search } from "@/app/daftarBarang/Binary-Search";
-import { insertBarangEvent } from "./LocalStorageEvent";
+import { JSX, useState } from "react";
 
+// IMPORT MILIK SENDIRI
+import { B_Search } from "@/app/daftarBarang/Binary-Search";
+import { insertBarangEvent } from "../lib/LocalStorageEvent";
+
+// IMPORT TYPE MILIK SENDIRI
+import type { DataBarangType, FoundBarang } from "@/types/global"; 
+
+// TYPES
 type CardViewsProps = {
 	item: FoundBarang | null;
 	itemFromCart?: FoundBarang | null;
 	signalFromCard: (pesan: string, ok: boolean) => void;
 };
 
+// EXPORT HANDLERS
 export const handle_RemoveFromCart = (nameItem: string): boolean => {
 	try {
 		var barang: DataBarangType[] = JSON.parse(
@@ -54,11 +61,6 @@ export default function CardViews({
 	itemFromCart,
 	signalFromCard,
 }: CardViewsProps): JSX.Element {
-	// TRACKERS
-	const [statusItemTxt, setStatusItemTxt] = useState<
-		"Masukkin ke keranjang" | "Buang dari keranjang"
-		>("Masukkin ke keranjang");
-
 	// CHECK WHETHER THE BOTH OF DATA IS EXIST OR NOT
 	if (!item) {
 		return (
@@ -77,6 +79,7 @@ export default function CardViews({
 				localStorage.getItem("cart") ?? "[]"
 			);
 			barang.push({ ...item, addedToCart: true });
+			
 			localStorage.setItem("cart", JSON.stringify(barang));
 			insertBarangEvent("cart", barang);
 			signalFromCard?.("Barang berhasil dimasukkan ke keranjang", true);
@@ -143,6 +146,7 @@ export default function CardViews({
 			</CardContent>
 
 			<CardFooter className='flex-col gap-3 p-4 pt-0 flex-shrink-0'>
+				{/* TOMBOL PESAN SEKARANG */}
 				<Button
 					variant={"default"}
 					className='w-full bg-green-500 hover:bg-green-600 h-10 text-sm'>
@@ -153,6 +157,8 @@ export default function CardViews({
 					/>
 					Pesan sekarang
 				</Button>
+
+				{/* TOMBOL MASUKKAN KE KERANJANG / BUANG DARI KERANJANG */}
 				<Button
 					variant={"outline"}
 					className='w-full border-green-500 text-green-500 hover:bg-green-50 h-10 text-sm'

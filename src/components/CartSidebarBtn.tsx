@@ -29,16 +29,12 @@ import { DataBarangType, FoundBarang } from "@/types/global";
 import ItemCard from "./ItemCard";
 import { B_Search } from "@/app/daftarBarang/Binary-Search";
 
-type CartSidebarBtnTypeProps = {
-	updateCart?: () => void;
-}
-
-export default function CartSidebarBtn({
-	updateCart
-}: CartSidebarBtnTypeProps): JSX.Element {
+export default function CartSidebarBtn(): JSX.Element {
+	// HOOKS
 	const [barang, setBarang] = useState<FoundBarang[] | null>(null);
 	const [BarangFound, setBarangFound] = useState<FoundBarang[] | null>(null);
 
+	// HANDLERS
 	const getBarangCart = () => {
 		try {
 			const item: FoundBarang[] | null = JSON.parse(
@@ -122,6 +118,7 @@ export default function CartSidebarBtn({
 							barang?.length === 0 ? "justify-center items-center" : ""
 						}`}>
 						{(BarangFound ?? []).length > 0 ? (
+							// NGERENDER HASIL PENCARIAN BARANG
 							BarangFound!.map((item) => {
 								return (
 									<div key={item.id}>
@@ -133,10 +130,12 @@ export default function CartSidebarBtn({
 								);
 							})
 						) : barang?.length === 0 ? (
+							// KALO BARANGNYA KOSONG YANG NAMPILIN INI
 							<span className='text-gray-400'>
 								Keranjang kamu kosong nih...
 							</span>
-						) : (
+							) : (
+							// NAMPILIN SELURUH BARANG YANG ADA DI KERANJANG
 							barang?.map((item) => {
 								return (
 									<div key={item.id}>
@@ -154,7 +153,7 @@ export default function CartSidebarBtn({
 				<SheetFooter>
 					<Button className='bg-green-500'>Order sekarang</Button>
 					<SheetClose asChild>
-						<Button variant={"outline"} onClick={() => updateCart?.()}>
+						<Button variant={"outline"}>
 							Nanti dulu, mau nyari yang lain dulu
 						</Button>
 					</SheetClose>

@@ -1,6 +1,6 @@
 "use client";
 
-// TOOLS
+// TOOLS REACT / NEXT
 import { Icon } from "@iconify/react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -21,11 +21,13 @@ import type { DataBarangType, FoundBarang } from "@/types/global";
 import ProfileMenu from "@/components/ProfileMenu";
 import CartSidebarBtn from "@/components/CartSidebarBtn";
 
+// TYPES
 type cartEventTypes = {
 	key: string;
 	newValue: FoundBarang[];
 };
 
+// EXPORT FUNCTION
 export const getBarangKeranjang = (): Map<number, FoundBarang> | null => {
 	if (typeof window === "undefined") return null;
 
@@ -125,6 +127,7 @@ export default function DaftarBarang() {
 		router.push("/signin?callbackUrl=/daftarBarang");
 	}
 
+	// NON HOOKS DATA (STATIC)
 	// DATA BARANG SORTED VERSION
 	const SortedBarangAZ: DataBarangType[] = DataBarang.sort((a, b) => {
 		return a.nama.toLowerCase().localeCompare(b.nama.toLowerCase());
@@ -266,7 +269,7 @@ export default function DaftarBarang() {
 
 							{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
 							<div className='pinjam'>
-								<CartSidebarBtn updateCart={handleUpdateCart} />
+								<CartSidebarBtn />
 							</div>
 						</div>
 					</div>
@@ -278,6 +281,7 @@ export default function DaftarBarang() {
 				<div className='dataBarang flex flex-col'>
 					<div className='daftarBaran flex flex-wrap shrink-0 gap-10 justify-center'>
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
+							{/* NGERENDER HASIL PENCARIAN BARANG */}
 							{isFound &&
 								Array.isArray(dataFound) &&
 								dataFound.map((item, index) => (
@@ -290,8 +294,10 @@ export default function DaftarBarang() {
 									</div>
 								))}
 
+							{/* NGERENDER SELURUH BARANG YANG ADA */}
 							{!isFound &&
 								DataBarang.map((item, index) => {
+									// NGERENDER SELURUH BARANG YANG ADA
 									if (selectedCategory.length === 0) {
 										return (
 											<div key={item.id}>
@@ -302,6 +308,8 @@ export default function DaftarBarang() {
 											</div>
 										);
 									}
+
+									// NGERENDER SELURUH BARANG BERDASARKAN KATEGORI
 									if (
 										selectedCategory.length > 0 &&
 										selectedCategory.includes(item.kategori)
@@ -315,6 +323,8 @@ export default function DaftarBarang() {
 											</div>
 										);
 									}
+
+									// KALO NGGA ADA BARANG SAMA SEKALI YA RETURN NULL
 									return null;
 								})}
 						</div>
