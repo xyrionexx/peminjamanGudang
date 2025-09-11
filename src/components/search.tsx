@@ -1,12 +1,19 @@
 "use client";
 
+// IMPORT TYPES
 import type React from "react";
 
+// REACT
 import { useState } from "react";
+
+// ICONS
 import { Search, X, Loader2 } from "lucide-react";
+
+// SHADCN
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+// TYPES
 interface EnhancedSearchProps {
 	placeholder?: string;
 	onSearch?: (value: string) => void;
@@ -22,9 +29,11 @@ export function EnhancedSearch({
 	isLoading = false,
 	className = "",
 }: EnhancedSearchProps) {
+	// HOOKS
 	const [searchValue, setSearchValue] = useState("");
 	const [isFocused, setIsFocused] = useState(false);
 
+	// HANLDERS
 	const handleSearch = () => {
 		if (searchValue.trim()) {
 			onSearch?.(searchValue.trim());
@@ -46,7 +55,7 @@ export function EnhancedSearch({
 	};
 
 	return (
-		<div className={`relative w-full max-w-lg ${className}`}>
+		<div className={`relative w-full ${className}`}>
 			<div
 				className={`
           relative flex items-center gap-2 

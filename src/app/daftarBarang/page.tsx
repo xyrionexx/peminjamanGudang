@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import * as Pagination from "@/components/ui/pagination";
 
 // IMPORT MILIK SENDIRI / KITA
 import { DataBarang } from "./dummyData";
@@ -20,6 +21,7 @@ import { loading_circle } from "@/components/Loading";
 import type { DataBarangType, FoundBarang } from "@/types/global";
 import ProfileMenu from "@/components/ProfileMenu";
 import CartSidebarBtn from "@/components/CartSidebarBtn";
+import Footer from "@/components/footer";
 
 // TYPES
 type cartEventTypes = {
@@ -277,60 +279,101 @@ export default function DaftarBarang() {
 			</div>
 
 			{/* MAIN CONTENT */}
-			<div className='DaftarBarang flex flex-col gap-4 py-20'>
-				<div className='dataBarang flex flex-col'>
-					<div className='daftarBaran flex flex-wrap shrink-0 gap-10 justify-center'>
-						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
-							{/* NGERENDER HASIL PENCARIAN BARANG */}
-							{isFound &&
-								Array.isArray(dataFound) &&
-								dataFound.map((item, index) => (
-									<div key={item.id}>
-										<CardViews
-											item={item}
-											itemFromCart={barangKeranjang?.get(index)}
-											signalFromCard={handleCardSignal}
-										/>
-									</div>
-								))}
+			<div className='flex flex-col py-20'>
+				{/* DAFTAR BARANG */}
+				<div className='flex flex-wrap shrink-0 gap-10 justify-center'>
+					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
+						{/* NGERENDER HASIL PENCARIAN BARANG */}
+						{isFound &&
+							Array.isArray(dataFound) &&
+							dataFound.map((item, index) => (
+								<div key={item.id}>
+									<CardViews
+										item={item}
+										itemFromCart={barangKeranjang?.get(index)}
+										signalFromCard={handleCardSignal}
+									/>
+								</div>
+							))}
 
-							{/* NGERENDER SELURUH BARANG YANG ADA */}
-							{!isFound &&
-								DataBarang.map((item, index) => {
-									// NGERENDER SELURUH BARANG YANG ADA
-									if (selectedCategory.length === 0) {
-										return (
-											<div key={item.id}>
-												<CardViews
-													item={item}
-													itemFromCart={barangKeranjang?.get(item.id)}
-													signalFromCard={handleCardSignal}></CardViews>
-											</div>
-										);
-									}
+						{/* NGERENDER SELURUH BARANG YANG ADA */}
+						{!isFound &&
+							DataBarang.map((item, index) => {
+								// NGERENDER SELURUH BARANG YANG ADA
+								if (selectedCategory.length === 0) {
+									return (
+										<div key={item.id}>
+											<CardViews
+												item={item}
+												itemFromCart={barangKeranjang?.get(item.id)}
+												signalFromCard={handleCardSignal}></CardViews>
+										</div>
+									);
+								}
 
-									// NGERENDER SELURUH BARANG BERDASARKAN KATEGORI
-									if (
-										selectedCategory.length > 0 &&
-										selectedCategory.includes(item.kategori)
-									) {
-										return (
-											<div key={item.id}>
-												<CardViews
-													item={item}
-													itemFromCart={barangKeranjang?.get(index)}
-													signalFromCard={handleCardSignal}></CardViews>
-											</div>
-										);
-									}
+								// NGERENDER SELURUH BARANG BERDASARKAN KATEGORI
+								if (
+									selectedCategory.length > 0 &&
+									selectedCategory.includes(item.kategori)
+								) {
+									return (
+										<div key={item.id}>
+											<CardViews
+												item={item}
+												itemFromCart={barangKeranjang?.get(index)}
+												signalFromCard={handleCardSignal}></CardViews>
+										</div>
+									);
+								}
 
-									// KALO NGGA ADA BARANG SAMA SEKALI YA RETURN NULL
-									return null;
-								})}
-						</div>
+								// KALO NGGA ADA BARANG SAMA SEKALI YA RETURN NULL
+								return null;
+							})}
 					</div>
 				</div>
+
+				{/* PAGINATION */}
+				<div className="mt-10">
+					<Pagination.Pagination>
+						<Pagination.PaginationContent>
+							{/* PREVIOUS PAGE */}
+							<Pagination.PaginationItem>
+								<Pagination.PaginationPrevious href='#' />
+							</Pagination.PaginationItem>
+
+							{/* NUMBER SELECTION OF PAGES */}
+							<Pagination.PaginationItem>
+								<Pagination.PaginationLink href='#' isActive>
+									1
+								</Pagination.PaginationLink>
+							</Pagination.PaginationItem>
+							<Pagination.PaginationItem>
+								<Pagination.PaginationLink href='#'>
+									2
+								</Pagination.PaginationLink>
+							</Pagination.PaginationItem>
+							<Pagination.PaginationItem>
+								<Pagination.PaginationLink href='#'>
+									3
+								</Pagination.PaginationLink>
+							</Pagination.PaginationItem>
+
+							{/* TITIK-TITIK */}
+							<Pagination.PaginationItem>
+								<Pagination.PaginationEllipsis />
+							</Pagination.PaginationItem>
+
+							{/* NEXT PAGE */}
+							<Pagination.PaginationItem>
+								<Pagination.PaginationNext href='#' />
+							</Pagination.PaginationItem>
+						</Pagination.PaginationContent>
+					</Pagination.Pagination>
+				</div>
 			</div>
+
+			{/* FOOTER */}
+			<Footer />
 		</>
 	);
 }

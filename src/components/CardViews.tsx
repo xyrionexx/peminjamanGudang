@@ -14,14 +14,15 @@ import { Button } from "./ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { JSX, useState } from "react";
+import { JSX } from "react";
+import { useRouter } from "next/navigation";
 
 // IMPORT MILIK SENDIRI
 import { B_Search } from "@/app/daftarBarang/Binary-Search";
 import { insertBarangEvent } from "../lib/LocalStorageEvent";
 
 // IMPORT TYPE MILIK SENDIRI
-import type { DataBarangType, FoundBarang } from "@/types/global"; 
+import type { DataBarangType, FoundBarang } from "@/types/global";
 
 // TYPES
 type CardViewsProps = {
@@ -56,11 +57,15 @@ export const handle_RemoveFromCart = (nameItem: string): boolean => {
 	}
 };
 
+// MAIN FUNCTION
 export default function CardViews({
 	item,
 	itemFromCart,
 	signalFromCard,
 }: CardViewsProps): JSX.Element {
+	// HOOKS
+	const router = useRouter();
+
 	// CHECK WHETHER THE BOTH OF DATA IS EXIST OR NOT
 	if (!item) {
 		return (
@@ -72,6 +77,18 @@ export default function CardViews({
 		);
 	}
 
+	// FUNCTIONS
+	function removeWhitespaceAndLowercase(text: string): string {
+		let result = "";
+		for (let i = 0; i < text.length; i++) {
+			const char = text[i];
+			if (char !== " " && char !== "\t" && char !== "\n" && char !== "\r") {
+				result += char.toLowerCase();
+			}
+		}
+		return result;
+	}
+
 	// HANDLERS
 	const handle_AddToCart = (item: DataBarangType): void => {
 		try {
@@ -79,7 +96,7 @@ export default function CardViews({
 				localStorage.getItem("cart") ?? "[]"
 			);
 			barang.push({ ...item, addedToCart: true });
-			
+
 			localStorage.setItem("cart", JSON.stringify(barang));
 			insertBarangEvent("cart", barang);
 			signalFromCard?.("Barang berhasil dimasukkan ke keranjang", true);
@@ -96,6 +113,10 @@ export default function CardViews({
 		} catch (error) {
 			signalFromCard("waduh ada yang error nih", false);
 		}
+	};
+
+	const getCurrentBarang = (): void => {
+		localStorage.setItem("barang", JSON.stringify(item));
 	};
 
 	// OBJECT
@@ -149,7 +170,13 @@ export default function CardViews({
 				{/* TOMBOL PESAN SEKARANG */}
 				<Button
 					variant={"default"}
-					className='w-full bg-green-500 hover:bg-green-600 h-10 text-sm'>
+					className='w-full bg-green-500 hover:bg-green-600 h-10 text-sm'
+					onClick={() =>
+						router.push(
+							`/itemDetails/${removeWhitespaceAndLowercase(item.nama)}`
+						)
+					}
+					onMouseEnter={() => getCurrentBarang()}>
 					<Icon
 						icon='material-symbols:shopping-bag-outline'
 						width='24'
@@ -168,10 +195,7 @@ export default function CardViews({
 							if (result) {
 								signalFromCard("berhasil buang barang dari keranjang!", true);
 							} else {
-								signalFromCard(
-									"aduhhh... kebelet eek",
-									false
-								);
+								signalFromCard("aduhhh... kebelet eek", false);
 							}
 						} else {
 							handle_AddToCart(item);
