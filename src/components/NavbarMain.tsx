@@ -1,26 +1,108 @@
+"use client";
+
 // REACT
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 // SHADCN
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "./ui/separator";
+import {
+	Popover,
+	PopoverTrigger,
+	PopoverContent,
+} from "@radix-ui/react-popover";
+
+// ICON
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 // IMPORT MILIK KITA SENDIRI
 import ProfileMenu from "./ProfileMenu";
 import { EnhancedSearch } from "./search";
 import CartSidebarBtn from "./CartSidebarBtn";
+import { B_Search } from "@/app/daftarBarang/Binary-Search";
+import { DataBarang } from "@/app/daftarBarang/dummyData";
+import { FoundBarang } from "@/types/global";
 
 export default function MainNavbar() {
 	// HOOKS
-	const { data: session, status } = useSession();
+	const { data: session } = useSession();
+	const router: AppRouterInstance = useRouter();
+
+	// DATA SEARCH REQUIREMENTS (HOOKS)
+	const [dataFound, setDataFound] = useState<FoundBarang[] | boolean>(
+		[]
+	);
+	const [searchHistory, setSearchHistory] = useState<string[]>([
+		"laptop",
+		"wong saya sukak kok",
+		"nye nye nye bapana tukang batagor",
+	]);
 
 	// HANDLERS
-	const handleSearch = (): void => {};
+	const handleSearch = (): void => {
+		if (!dataFound || !Array.isArray(dataFound)) return;
+		router.push(
+			"/daftarBarang?barang=" +
+				dataFound.map((item: FoundBarang) => item.index).join(",")
+		);
+	};
 
-	const handleReset = (): void => {};
+	const handleSearchOnChange = (searchValue: string): void => {
+		const hasil: FoundBarang[] | boolean = B_Search(DataBarang, searchValue);
+		setDataFound(hasil);
+	};
+
+	const handleReset = (): void => {
+		setDataFound([]);
+	};
 
 	return (
 		<div className='fixed top-0 left-0 right-0 z-50 bg-white shadow-md'>
 			<div className='navbar flex items-center py-4 px-10 gap-5'>
+				{/* LOGO */}
+				<div>
+					<Link
+						href={"/daftarBarang"}
+						className='cursor-pointer'>
+						<h1 className='text-2xl font-bold text-[#A2AF9B]'>G-WARE</h1>
+					</Link>
+				</div>
+
+				{/* SEARCH BAR */}
+				<div className='flex flex-1'>
+					<EnhancedSearch
+						placeholder='Mangga cari barang disini'
+						onSearch={handleSearch}
+						searchOnChange={handleSearchOnChange}
+						onReset={handleReset}
+						searchHistory={searchHistory}
+						dataFound={dataFound}
+					/>
+				</div>
+
+				{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
+				<div>
+					<CartSidebarBtn />
+				</div>
+
+				{/* NOTIFIKASI */}
+				<div className='cursor-pointer'>
+					<Icon
+						icon='mdi:bell-outline'
+						width='20'
+						height='20'
+					/>
+				</div>
+
+				{/* SEPARATOR */}
+				<div className='h-7'>
+					<Separator orientation='vertical' />
+				</div>
+
 				{/* AVATAR */}
 				<div className='flex gap-3 justify-center items-center'>
 					<Avatar>
@@ -37,20 +119,6 @@ export default function MainNavbar() {
 					</p>
 
 					<ProfileMenu />
-				</div>
-
-				{/* SEARCH BAR */}
-				<div className='flex flex-1'>
-					<EnhancedSearch
-						placeholder='Mangga cari barang disini'
-						onSearch={handleSearch}
-						onReset={handleReset}
-					/>
-				</div>
-
-				{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
-				<div>
-					<CartSidebarBtn />
 				</div>
 			</div>
 		</div>

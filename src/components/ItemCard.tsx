@@ -12,7 +12,7 @@ export default function ItemCard(
 	{barang, getBarang}: itemTypeProps
 ) {
 	return (
-		<div className='bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 p-4'>
+		<div className='bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-green-500 transition-all duration-200 p-4'>
 			<div className='flex items-center gap-4'>
 				{/* Image */}
 				<div className='flex-shrink-0'>

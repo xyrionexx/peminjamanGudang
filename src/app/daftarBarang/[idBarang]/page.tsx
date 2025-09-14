@@ -37,11 +37,19 @@ export default function ProductDetailPage() {
 	const [quantity, setQuantity] = useState(1);
 	const [isFavorited, setIsFavorited] = useState(false);
 	const [barang, setBarang] = useState<FoundBarang | null>(null);
+	const [urlPathname, setURLPathname] = useState<string[]>();
 
 	// HOOK HANDLERS
 	useEffect(() => {
 		setBarang(JSON.parse(localStorage.getItem("barang") ?? "[]"));
 	}, []);
+
+	useEffect(() => {
+		setURLPathname(window.location.pathname.split("/"));
+	}, []);
+
+	// STATIC DATA / NON HOOKS
+	let breadCrumbPath: string = "";
 
 	return (
 		<div className='min-h-screen bg-background'>
@@ -53,20 +61,39 @@ export default function ProductDetailPage() {
 			{/* MAIN CONTENT */}
 			<div className='container mx-auto px-4 py-6'>
 				{/* BREADCRUMB */}
-				<div className="mb-5">
+				<div className='mb-5'>
 					<Breadcrumb>
 						<BreadcrumbList>
 							<BreadcrumbItem>
 								<BreadcrumbLink href='/'>Home</BreadcrumbLink>
 							</BreadcrumbItem>
 							<BreadcrumbSeparator />
-							<BreadcrumbItem>
-								<BreadcrumbLink href='/components'>Components</BreadcrumbLink>
-							</BreadcrumbItem>
-							<BreadcrumbSeparator />
-							<BreadcrumbItem>
-								<BreadcrumbPage>{barang?.nama}</BreadcrumbPage>
-							</BreadcrumbItem>
+							{urlPathname?.map((path: string, index: number) => {
+								if (path === "") return;
+
+								breadCrumbPath += `/${path}`;
+								return (
+									<div
+										key={index}
+										className={`flex flex-row items-center gap-2`}>
+										<BreadcrumbItem>
+											<BreadcrumbLink
+												href={breadCrumbPath}
+												className={
+													index === urlPathname.length - 1
+														? "text-green-500"
+														: ""
+												}>
+												{path}
+											</BreadcrumbLink>
+										</BreadcrumbItem>
+
+										{index !== urlPathname.length - 1 && (
+											<BreadcrumbSeparator />
+										)}
+									</div>
+								);
+							})}
 						</BreadcrumbList>
 					</Breadcrumb>
 				</div>

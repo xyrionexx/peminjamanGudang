@@ -173,7 +173,7 @@ export default function CardViews({
 					className='w-full bg-green-500 hover:bg-green-600 h-10 text-sm'
 					onClick={() =>
 						router.push(
-							`/itemDetails/${removeWhitespaceAndLowercase(item.nama)}`
+							`daftarBarang/${removeWhitespaceAndLowercase(item.nama)}`
 						)
 					}
 					onMouseEnter={() => getCurrentBarang()}>

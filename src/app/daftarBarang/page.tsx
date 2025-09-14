@@ -2,26 +2,23 @@
 
 // TOOLS REACT / NEXT
 import { Icon } from "@iconify/react";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 // SHADCN
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import * as Pagination from "@/components/ui/pagination";
 
 // IMPORT MILIK SENDIRI / KITA
 import { DataBarang } from "./dummyData";
 import { B_Search } from "./Binary-Search";
-import { EnhancedSearch } from "@/components/search";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
 import type { DataBarangType, FoundBarang } from "@/types/global";
-import ProfileMenu from "@/components/ProfileMenu";
-import CartSidebarBtn from "@/components/CartSidebarBtn";
 import Footer from "@/components/footer";
+import MainNavbar from "@/components/NavbarMain";
 
 // TYPES
 type cartEventTypes = {
@@ -49,7 +46,7 @@ export const getBarangKeranjang = (): Map<number, FoundBarang> | null => {
 export default function DaftarBarang() {
 	// ANOTHER HOOK TOOLS
 	const { data: session, status } = useSession();
-	const router = useRouter();
+	const router: AppRouterInstance = useRouter();
 
 	// HOOKS FOR CATEGORY
 	let [selectedCategory, setSelectedCategory] = useState<string[]>([]);
@@ -87,10 +84,7 @@ export default function DaftarBarang() {
 	);
 
 	// HOOKS FOR SEARCH RESULT
-	const [dataFound, setDataFound] = useState<number | DataBarangType[] | null>(
-		null
-	);
-	const [isFound, setIsFound] = useState<boolean>(false);
+	const [searchBarang, setSearchBarang] = useState<number[]>();
 
 	// HOOKS FOR CART / KERANJANG
 	const [barangKeranjang, setBarangKeranjang] = useState<Map<
@@ -99,13 +93,13 @@ export default function DaftarBarang() {
 	> | null>();
 
 	// HOOK HANDLERS
+	// AMBIL BARANG AWAL DARI KERANJANG
 	useEffect(() => {
-		// AMBIL BARANG DARI KERANJANG
 		setBarangKeranjang(getBarangKeranjang());
 	}, []);
 
+	// NANGKEP EVENT KETIKA HABIS MASUKAN BARANG KE KERANJANG
 	useEffect(() => {
-		// NANGKEP EVENT KETIKA HABIS MASUKAN BARANG KE KERANJANG
 		window.addEventListener("cartUpdate", (event: Event) => {
 			const customEvent = event as CustomEvent<cartEventTypes>;
 			if (customEvent.detail.key === "cart") {
@@ -119,21 +113,31 @@ export default function DaftarBarang() {
 				);
 			}
 		});
-	});
+	}, []);
+
+	// MENGAMBIL HASIL SEARCH DARI URL PARAMETER
+	useEffect(() => {
+		const params: URLSearchParams = new URLSearchParams(window.location.search);
+		const barangParam: string | null = params.get("barang");
+		if (barangParam == null) return;
+		setSearchBarang(
+			barangParam
+				.split(",")
+				.map((indexBarang: string) => Number(indexBarang))
+		);
+	}, []);
+
+	// NGECEK STATUS PENGGUNA
+	useEffect(() => {
+		if (status === "unauthenticated") {
+			router.push("/signin?callbackUrl=/daftarBarang");
+		}
+	}, [status, router]);
 
 	// ACCOUNT LOG IN / LOG OUT VALIDATION
 	if (status === "loading") {
 		return loading_circle();
 	}
-	if (status === "unauthenticated") {
-		router.push("/signin?callbackUrl=/daftarBarang");
-	}
-
-	// NON HOOKS DATA (STATIC)
-	// DATA BARANG SORTED VERSION
-	const SortedBarangAZ: DataBarangType[] = DataBarang.sort((a, b) => {
-		return a.nama.toLowerCase().localeCompare(b.nama.toLowerCase());
-	});
 
 	// HANLDERS
 	const handleCategory = (category: { name: string; status: boolean }) => {
@@ -147,31 +151,12 @@ export default function DaftarBarang() {
 		category.status = !category.status;
 	};
 
+	// HANDLE CLEAR ALL CATEGORY
 	const handleClearAll = (): void => {
 		setSelectedCategory([]);
 		category.forEach((item) => {
 			item.status = false;
 		});
-	};
-
-	const handleSearch = (searchValue: string): void => {
-		if (searchValue.length === 0) {
-			setIsFound(false);
-			setDataFound(null);
-			return;
-		}
-
-		const result: FoundBarang[] | null = B_Search(SortedBarangAZ, searchValue);
-		if (result === null) return;
-		setDataFound(result);
-		setIsFound(true);
-		console.log(result);
-	};
-
-	const handleReset = () => {
-		setIsFound(false);
-		setDataFound([]);
-		return;
 	};
 
 	const handleCardSignal = (pesan: string, ok: boolean) => {
@@ -195,145 +180,55 @@ export default function DaftarBarang() {
 		});
 	};
 
-	const handleUpdateCart = () => {
-		setBarangKeranjang(getBarangKeranjang());
-	};
-
 	return (
 		<>
 			{/* NAVBAR */}
-			<div className='fixed top-0 left-0 right-0 z-50 bg-white shadow-md'>
-				<div className='navbar flex items-center justify-center py-4'>
-					<div className='searchMenu flex items-center justify-center mx-auto gap-5'>
-						{/* AVATAR */}
-						<div className='flex gap-3 justify-center items-center'>
-							<Avatar>
-								<AvatarImage
-									src={
-										session?.user.image ??
-										"https://avatar.iran.liara.run/public"
-									}
-								/>
-								<AvatarFallback>ID</AvatarFallback>
-							</Avatar>
-
-							<p className='flex shrink-0 whitespace-nowrap'>
-								{session?.user.name}
-							</p>
-
-							<ProfileMenu />
-						</div>
-
-						{/* SEARCH BAR */}
-						<div className='search flex w-full max-w-lg pr-2'>
-							<EnhancedSearch
-								placeholder='Mangga cari barang disini'
-								onSearch={handleSearch}
-								onReset={handleReset}
-								className='w-full'
-							/>
-						</div>
-
-						{/* KATEGORI */}
-						<div className='menu flex gap-5 items-center'>
-							<div className='kategori'>
-								<ul className='flex text-black gap-5'>
-									{/* TOMBOL RESET KATEGORI */}
-									{(() => {
-										if (selectedCategory.length > 0) {
-											return (
-												<Button
-													variant='destructive'
-													size='sm'
-													onClick={handleClearAll}>
-													Clear all
-												</Button>
-											);
-										}
-									})()}
-
-									{/* TOMBOL-TOMBOL KATEGORI */}
-									{category.map((item) => (
-										<li key={item.name}>
-											<Button
-												variant={item.status ? "default" : "outline"}
-												size='sm'
-												onClick={() => {
-													handleCategory(item);
-												}}
-												className='hover:text-gray-600 transition-colors'>
-												{item.name}
-											</Button>
-										</li>
-									))}
-								</ul>
-							</div>
-
-							{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
-							<div className='pinjam'>
-								<CartSidebarBtn />
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+			<MainNavbar />
 
 			{/* MAIN CONTENT */}
 			<div className='flex flex-col py-20'>
 				{/* DAFTAR BARANG */}
 				<div className='flex flex-wrap shrink-0 gap-10 justify-center'>
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
-						{/* NGERENDER HASIL PENCARIAN BARANG */}
-						{isFound &&
-							Array.isArray(dataFound) &&
-							dataFound.map((item, index) => (
-								<div key={item.id}>
-									<CardViews
-										item={item}
-										itemFromCart={barangKeranjang?.get(index)}
-										signalFromCard={handleCardSignal}
-									/>
-								</div>
-							))}
+
 
 						{/* NGERENDER SELURUH BARANG YANG ADA */}
-						{!isFound &&
-							DataBarang.map((item, index) => {
-								// NGERENDER SELURUH BARANG YANG ADA
-								if (selectedCategory.length === 0) {
-									return (
-										<div key={item.id}>
-											<CardViews
-												item={item}
-												itemFromCart={barangKeranjang?.get(item.id)}
-												signalFromCard={handleCardSignal}></CardViews>
-										</div>
-									);
-								}
+						{DataBarang.map((item, index) => {
+							// NGERENDER SELURUH BARANG YANG ADA
+							if (selectedCategory.length === 0) {
+								return (
+									<div key={item.id}>
+										<CardViews
+											item={item}
+											itemFromCart={barangKeranjang?.get(item.id)}
+											signalFromCard={handleCardSignal}></CardViews>
+									</div>
+								);
+							}
 
-								// NGERENDER SELURUH BARANG BERDASARKAN KATEGORI
-								if (
-									selectedCategory.length > 0 &&
-									selectedCategory.includes(item.kategori)
-								) {
-									return (
-										<div key={item.id}>
-											<CardViews
-												item={item}
-												itemFromCart={barangKeranjang?.get(index)}
-												signalFromCard={handleCardSignal}></CardViews>
-										</div>
-									);
-								}
+							// NGERENDER SELURUH BARANG BERDASARKAN KATEGORI
+							if (
+								selectedCategory.length > 0 &&
+								selectedCategory.includes(item.kategori)
+							) {
+								return (
+									<div key={item.id}>
+										<CardViews
+											item={item}
+											itemFromCart={barangKeranjang?.get(index)}
+											signalFromCard={handleCardSignal}></CardViews>
+									</div>
+								);
+							}
 
-								// KALO NGGA ADA BARANG SAMA SEKALI YA RETURN NULL
-								return null;
-							})}
+							// KALO NGGA ADA BARANG SAMA SEKALI YA RETURN NULL
+							return null;
+						})}
 					</div>
 				</div>
 
 				{/* PAGINATION */}
-				<div className="mt-10">
+				<div className='mt-10'>
 					<Pagination.Pagination>
 						<Pagination.PaginationContent>
 							{/* PREVIOUS PAGE */}
@@ -343,7 +238,9 @@ export default function DaftarBarang() {
 
 							{/* NUMBER SELECTION OF PAGES */}
 							<Pagination.PaginationItem>
-								<Pagination.PaginationLink href='#' isActive>
+								<Pagination.PaginationLink
+									href='#'
+									isActive>
 									1
 								</Pagination.PaginationLink>
 							</Pagination.PaginationItem>

@@ -75,10 +75,10 @@ export default function CartSidebarBtn(): JSX.Element {
 					onMouseEnter={getBarangCart}>
 					<SheetTrigger asChild>
 						<Icon
-							icon='fluent-mdl2:work-item'
+							icon='vaadin:cart-o'
 							width='20'
 							height='20'
-							style={{ color: "#000" }}
+							className="cursor-pointer"
 						/>
 					</SheetTrigger>
 				</TooltipTrigger>
@@ -89,8 +89,8 @@ export default function CartSidebarBtn(): JSX.Element {
 			</Tooltip>
 
 			{/* SIDE RIGHT BAR  / SHEET CONTENT */}
-			<SheetContent>
-				<SheetHeader>
+			<SheetContent className="flex flex-col h-full">
+				<SheetHeader className="shrink-0">
 					<SheetTitle className='text-green-500 text-2xl flex items-center gap-2'>
 						Keranjang
 						<Icon
@@ -103,9 +103,9 @@ export default function CartSidebarBtn(): JSX.Element {
 				</SheetHeader>
 
 				{/* CONTENT */}
-				<div className='flex mx-2 flex-col gap-5'>
+				<div className='flex-1 min-h-0 flex mx-2 flex-col gap-5'>
 					{/* search */}
-					<div>
+					<div className="shrink-0">
 						<EnhancedSearch
 							onSearch={handleSearch}
 							onReset={handleReset}
@@ -114,7 +114,7 @@ export default function CartSidebarBtn(): JSX.Element {
 
 					{/* ITEM */}
 					<div
-						className={`h-full max-h-full flex flex-col ${
+						className={`flex-1 min-h-0 flex flex-col gap-2 overflow-y-auto pb-5 ${
 							barang?.length === 0 ? "justify-center items-center" : ""
 						}`}>
 						{(BarangFound ?? []).length > 0 ? (
@@ -150,7 +150,7 @@ export default function CartSidebarBtn(): JSX.Element {
 					</div>
 				</div>
 
-				<SheetFooter>
+				<SheetFooter className="shrink-0">
 					<Button className='bg-green-500'>Order sekarang</Button>
 					<SheetClose asChild>
 						<Button variant={"outline"}>
