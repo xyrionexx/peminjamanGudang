@@ -48,7 +48,7 @@ export default function ProductDetailPage() {
 		setURLPathname(window.location.pathname.split("/"));
 	}, []);
 
-	// STATIC DATA / NON HOOKS
+	// STATIC DATA / NON STATE
 	let breadCrumbPath: string = "";
 
 	return (

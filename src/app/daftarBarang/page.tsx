@@ -180,6 +180,7 @@ export default function DaftarBarang() {
 				{/* DAFTAR BARANG */}
 				<div className='flex flex-wrap shrink-0 gap-10 justify-center'>
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
+						{/* NGERENDER HASIL PENCARIAN BARANG */}
 						{searchBarang?.id?.map((id) => {
 							const barangList: FoundBarang[] | undefined =
 								MappedDataBarang.get(searchBarang.kategori);
