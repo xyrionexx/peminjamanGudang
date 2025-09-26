@@ -15,10 +15,12 @@ import { Separator } from "./ui/separator";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 // IMPORT MILIK KITA SENDIRI
+// COMPONENTS
 import ProfileMenu from "./ProfileMenu";
-import { EnhancedSearch } from "./search";
 import CartSidebarBtn from "./CartSidebarBtn";
-import { B_Search } from "@/app/daftarBarang/Binary-Search";
+// FUNCTIONS
+import { EnhancedSearch } from "./search";
+import { B_Search } from "@/app/scripts/Binary-Search";
 import { MappedDataBarang } from "@/app/daftarBarang/dummyData";
 import { FoundBarang } from "@/types/global";
 import { BarangEvent } from "@/lib/LocalStorageEvent";
@@ -40,27 +42,32 @@ export default function MainNavbar() {
 	const handleSearch = (searchValue: string): void => {
 		const huruf: string = searchValue[0].toLowerCase();
 
-		if (!dataFound || !Array.isArray(dataFound)) return;
+		if (!dataFound) return;
+
 		router.push(
 			"/daftarBarang?barang=" +
 				dataFound.map((item: FoundBarang) => item.index).join(",") +
 				"?cat=" +
 				huruf
 		);
+
+		BarangEvent({ judulEvent: "PencarianBarangDitemukan" });
 	};
 
+	// searchOnChange itu maksudnya adalah searchOnType
 	const handleSearchOnChange = (searchValue: string): void => {
 		const huruf: string = searchValue[0].toLowerCase();
 		const daerahSearchBarang: FoundBarang[] | undefined =
 			MappedDataBarang.get(huruf);
 
 		if (daerahSearchBarang == null) return;
+
 		const hasil: FoundBarang[] | null = B_Search(
 			daerahSearchBarang,
 			searchValue
 		);
+
 		setDataFound(hasil);
-		BarangEvent({judulEvent: "PencarianBarangDitemukan"});
 	};
 
 	const handleReset = (): void => {

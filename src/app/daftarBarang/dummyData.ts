@@ -1,6 +1,5 @@
 import dummyImage from "../assets/dummy.jpg";
 import { DataBarangType, FoundBarang } from "@/types/global";
-import SortMap from "../scripts/MyCustomSorting";
 
 export const DataBarang: DataBarangType[] = [
 	{
@@ -175,5 +174,3 @@ for (const item of DataBarang) {
 		dataLama.push(item);
 	}
 }
-
-export const DataBarangSorted: FoundBarang[][] = SortMap(DataBarang);

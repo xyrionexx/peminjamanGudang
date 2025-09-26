@@ -1,23 +1,29 @@
 "use client";
 
 // TOOLS REACT / NEXT
+//==========================
 import { Icon } from "@iconify/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+//==========================
 
 // SHADCN
-import { toast } from "sonner";
+//==========================
 import * as Pagination from "@/components/ui/pagination";
+//==========================
 
 // IMPORT MILIK SENDIRI / KITA
+//==========================
+import { getBarangKeranjang } from "../scripts/cartHandler";
 import { DataBarang, MappedDataBarang } from "./dummyData";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
 import type { FoundBarang } from "@/types/global";
 import Footer from "@/components/footer";
 import MainNavbar from "@/components/NavbarMain";
+//==========================
 
 // TYPES
 type cartEventTypes = {
@@ -25,29 +31,16 @@ type cartEventTypes = {
 	newValue: FoundBarang[];
 };
 
-// EXPORT FUNCTION
-export const getBarangKeranjang = (): Map<number, FoundBarang> | null => {
-	if (typeof window === "undefined") return null;
-
-	const barangKeranjang: FoundBarang[] | null = JSON.parse(
-		localStorage.getItem("cart") ?? "[]"
-	);
-
-	if (barangKeranjang === null) {
-		return null;
-	}
-
-	return new Map(
-		barangKeranjang?.map((barang: FoundBarang) => [barang.id, barang])
-	);
-};
-
 export default function DaftarBarang() {
+	// STATE //
 	// ANOTHER HOOK TOOLS
+	//==========================
 	const { data: session, status } = useSession();
 	const router: AppRouterInstance = useRouter();
+	//============================
 
 	// HOOKS FOR CATEGORY
+	//==========================
 	let [selectedCategory, setSelectedCategory] = useState<string[]>([]);
 	const [category, setCategory] = useState<{ name: string; status: boolean }[]>(
 		[
@@ -81,6 +74,7 @@ export default function DaftarBarang() {
 			},
 		]
 	);
+	//==========================
 
 	// HOOKS FOR SEARCH RESULT
 	const [searchBarang, setSearchBarang] = useState<{
@@ -93,13 +87,16 @@ export default function DaftarBarang() {
 		number,
 		FoundBarang
 	> | null>();
+	// END OF STATES //
 
-	// HOOK HANDLERS
+	// HOOK HANDLERS / LIFECYCLES //
 	// AMBIL BARANG AWAL DARI KERANJANG
 	useEffect(() => {
 		setBarangKeranjang(getBarangKeranjang());
 	}, []);
 
+	// EVENT
+	//===================================
 	// NANGKEP EVENT KETIKA HABIS MASUKAN BARANG KE KERANJANG
 	useEffect(() => {
 		window.addEventListener("cartUpdate", (event: Event) => {
@@ -116,35 +113,43 @@ export default function DaftarBarang() {
 			}
 		});
 	}, []);
-
-	// MENGAMBIL HASIL SEARCH DARI URL PARAMETER
+	// NANGKEP EVENT DAN MENGAMBIL HASIL SEARCH DARI URL PARAMETER
 	useEffect(() => {
 		window.addEventListener("PencarianBarangDitemukan", () => {
-			const params: URLSearchParams = new URLSearchParams(window.location.search);
+			const params: URLSearchParams = new URLSearchParams(
+				window.location.search
+			);
 			const kategori: string | null = params.get("cat");
 			const barangParam: string | null = params.get("barang");
-	
+
 			if (barangParam == null || kategori == null) return;
+
 			setSearchBarang({
 				kategori: kategori,
 				id: barangParam?.split(",").map((id: string) => Number(id)),
 			});
 		});
 	}, []);
+	//===============================================
 
-	// NGECEK STATUS PENGGUNA
+	// ACCOUNT CHECKER
+	//======================
+	// NGECEK STATUS AKUN PENGGUNA
 	useEffect(() => {
 		if (status === "unauthenticated") {
 			router.push("/signin?callbackUrl=/daftarBarang");
 		}
 	}, [status, router]);
-
-	// ACCOUNT LOG IN / LOG OUT VALIDATION
+	// LOADING PAS LAGI NGECEK
 	if (status === "loading") {
 		return loading_circle();
 	}
+	//=======================
+	// END OF HOOK HANDLERS //
 
-	// HANLDERS
+	// HANLDERS //
+	// CATEGORY
+	//=======================
 	const handleCategory = (category: { name: string; status: boolean }) => {
 		if (selectedCategory.includes(category.name)) {
 			setSelectedCategory((prev) =>
@@ -155,7 +160,6 @@ export default function DaftarBarang() {
 		}
 		category.status = !category.status;
 	};
-
 	// HANDLE CLEAR ALL CATEGORY
 	const handleClearAll = (): void => {
 		setSelectedCategory([]);
@@ -163,27 +167,8 @@ export default function DaftarBarang() {
 			item.status = false;
 		});
 	};
-
-	const handleCardSignal = (pesan: string, ok: boolean) => {
-		toast(pesan, {
-			icon: ok ? (
-				<Icon
-					icon='teenyicons:tick-circle-outline'
-					width='15'
-					height='15'
-				/>
-			) : (
-				<Icon
-					icon='f7:exclamationmark'
-					width='56'
-					height='56'
-				/>
-			),
-			duration: 2000,
-			position: "bottom-center",
-			richColors: true,
-		});
-	};
+	//==========================
+	// END OF HANDLERS //
 
 	return (
 		<>
@@ -199,6 +184,7 @@ export default function DaftarBarang() {
 							const barangList: FoundBarang[] | undefined =
 								MappedDataBarang.get(searchBarang.kategori);
 							const barang: FoundBarang | undefined = barangList?.[id];
+
 							if (!barang) return null; // skip kalau undefined
 
 							return (
@@ -206,7 +192,6 @@ export default function DaftarBarang() {
 									<CardViews
 										item={barang}
 										itemFromCart={barangKeranjang?.get(barang.id)}
-										signalFromCard={handleCardSignal}
 									/>
 								</div>
 							);
@@ -220,8 +205,7 @@ export default function DaftarBarang() {
 									<div key={item.id}>
 										<CardViews
 											item={item}
-											itemFromCart={barangKeranjang?.get(item.id)}
-											signalFromCard={handleCardSignal}></CardViews>
+											itemFromCart={barangKeranjang?.get(item.id)}></CardViews>
 									</div>
 								);
 							}
@@ -235,8 +219,7 @@ export default function DaftarBarang() {
 									<div key={item.id}>
 										<CardViews
 											item={item}
-											itemFromCart={barangKeranjang?.get(index)}
-											signalFromCard={handleCardSignal}></CardViews>
+											itemFromCart={barangKeranjang?.get(index)}></CardViews>
 									</div>
 								);
 							}

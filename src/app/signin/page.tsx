@@ -40,10 +40,8 @@ export default function Signin() {
 	}
 
 	// HANDLERS
-	const callbackURL = () => {
-		const fullUrl = new URL(window.location.href);
-		const urlParam = new URLSearchParams(fullUrl.search);
-		return urlParam.get("callbackUrl") || "/";
+	const callbackURL = (): string => {
+		return new URLSearchParams(window.location.search).get("callbackUrl") ?? "";
 	};
 
 	return (

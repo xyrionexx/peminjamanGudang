@@ -27,7 +27,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { EnhancedSearch } from "./search";
 import { DataBarangType, FoundBarang } from "@/types/global";
 import ItemCard from "./ItemCard";
-import { B_Search } from "@/app/daftarBarang/Binary-Search";
+import { B_Search } from "@/app/scripts/Binary-Search";
 
 export default function CartSidebarBtn(): JSX.Element {
 	// HOOKS
@@ -78,7 +78,7 @@ export default function CartSidebarBtn(): JSX.Element {
 							icon='vaadin:cart-o'
 							width='20'
 							height='20'
-							className="cursor-pointer"
+							className='cursor-pointer'
 						/>
 					</SheetTrigger>
 				</TooltipTrigger>
@@ -89,8 +89,8 @@ export default function CartSidebarBtn(): JSX.Element {
 			</Tooltip>
 
 			{/* SIDE RIGHT BAR  / SHEET CONTENT */}
-			<SheetContent className="flex flex-col h-full">
-				<SheetHeader className="shrink-0">
+			<SheetContent className='flex flex-col h-full'>
+				<SheetHeader className='shrink-0'>
 					<SheetTitle className='text-green-500 text-2xl flex items-center gap-2'>
 						Keranjang
 						<Icon
@@ -105,7 +105,7 @@ export default function CartSidebarBtn(): JSX.Element {
 				{/* CONTENT */}
 				<div className='flex-1 min-h-0 flex mx-2 flex-col gap-5'>
 					{/* search */}
-					<div className="shrink-0">
+					<div className='shrink-0'>
 						<EnhancedSearch
 							onSearch={handleSearch}
 							onReset={handleReset}
@@ -134,7 +134,7 @@ export default function CartSidebarBtn(): JSX.Element {
 							<span className='text-gray-400'>
 								Keranjang kamu kosong nih...
 							</span>
-							) : (
+						) : (
 							// NAMPILIN SELURUH BARANG YANG ADA DI KERANJANG
 							barang?.map((item) => {
 								return (
@@ -150,7 +150,7 @@ export default function CartSidebarBtn(): JSX.Element {
 					</div>
 				</div>
 
-				<SheetFooter className="shrink-0">
+				<SheetFooter className='shrink-0'>
 					<Button className='bg-green-500'>Order sekarang</Button>
 					<SheetClose asChild>
 						<Button variant={"outline"}>

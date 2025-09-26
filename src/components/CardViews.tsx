@@ -1,6 +1,7 @@
 "use client";
 
 // SHADCN
+//==========================
 import {
 	Card,
 	CardContent,
@@ -9,61 +10,44 @@ import {
 	CardFooter,
 } from "@/components/ui/card";
 import { Button } from "./ui/button";
+//==========================
 
 // REACT IMPORTS
+//==========================
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { JSX } from "react";
 import { useRouter } from "next/navigation";
+//==========================
 
 // IMPORT MILIK SENDIRI
-import { B_Search } from "@/app/daftarBarang/Binary-Search";
+// COMPONENTS
+//==========================
+import notification from "./notification";
+//==========================
+// FUNCTIONS
+//==========================
+import { handle_RemoveFromCart } from "@/app/scripts/cartHandler";
 import { insertBarangEvent } from "../lib/LocalStorageEvent";
-
-// IMPORT TYPE MILIK SENDIRI
+//==========================
+// IMPORT TYPE
+//==========================
 import type { DataBarangType, FoundBarang } from "@/types/global";
+//==========================
 
 // TYPES
 type CardViewsProps = {
 	item: FoundBarang | null;
 	itemFromCart?: FoundBarang | null;
-	signalFromCard: (pesan: string, ok: boolean) => void;
-};
-
-// EXPORT HANDLERS
-export const handle_RemoveFromCart = (nameItem: string): boolean => {
-	try {
-		var barang: DataBarangType[] = JSON.parse(
-			localStorage.getItem("cart") ?? "[]"
-		);
-		barang = barang.sort((a, b) =>
-			a.nama.toLowerCase().localeCompare(b.nama.toLowerCase())
-		);
-
-		const hasil: FoundBarang[] | null = B_Search(barang, nameItem);
-
-		if (hasil === null) return false;
-		hasil.forEach((item) => {
-			if (item?.index == null) return;
-			barang.splice(item.index, 1);
-		});
-
-		localStorage.setItem("cart", JSON.stringify(barang));
-		insertBarangEvent("cart", barang);
-		return true;
-	} catch (error) {
-		throw new Error("error nih");
-	}
 };
 
 // MAIN FUNCTION
 export default function CardViews({
 	item,
 	itemFromCart,
-	signalFromCard,
 }: CardViewsProps): JSX.Element {
-	// HOOKS
+	// STATES
 	const router = useRouter();
 
 	// CHECK WHETHER THE BOTH OF DATA IS EXIST OR NOT
@@ -77,7 +61,7 @@ export default function CardViews({
 		);
 	}
 
-	// FUNCTIONS
+	// FUNCTIONS //
 	function removeWhitespaceAndLowercase(text: string): string {
 		let result = "";
 		for (let i = 0; i < text.length; i++) {
@@ -88,36 +72,41 @@ export default function CardViews({
 		}
 		return result;
 	}
+	const getCurrentBarang = (): void => {
+		localStorage.setItem("barang", JSON.stringify(item));
+	};
+	// END OF FUNCTIONS
 
-	// HANDLERS
+	// HANDLERS //
 	const handle_AddToCart = (item: DataBarangType): void => {
 		try {
 			var barang: FoundBarang[] = JSON.parse(
 				localStorage.getItem("cart") ?? "[]"
 			);
+
 			barang.push({ ...item, addedToCart: true });
 
 			localStorage.setItem("cart", JSON.stringify(barang));
 			insertBarangEvent("cart", barang);
-			signalFromCard?.("Barang berhasil dimasukkan ke keranjang", true);
+			notification({
+				pesan: "Barang berhasil ditambahkan ke keranjang",
+				ok: true,
+			});
 		} catch (error) {
+			notification({
+				pesan: "Gagal nyimpen barang ke keranjang :(",
+				deskripsi: error,
+				ok: false,
+			});
 			console.log("gagal menyimpan barang", error);
-			signalFromCard?.("Barang gagal disimpan ke keranjang :(", false);
 		}
 	};
-
-	const itemRemoveHandler = (itemName: string): void => {
-		try {
-			handle_RemoveFromCart(itemName);
-			signalFromCard("barang berhasil di buang dari keranjang", true);
-		} catch (error) {
-			signalFromCard("waduh ada yang error nih", false);
-		}
+	const handleCartAction = () => {
+		itemFromCart?.addedToCart
+			? handle_RemoveFromCart(item.nama)
+			: handle_AddToCart(item);
 	};
-
-	const getCurrentBarang = (): void => {
-		localStorage.setItem("barang", JSON.stringify(item));
-	};
+	// END OF HANDLERS //
 
 	// OBJECT
 	return (
@@ -190,16 +179,7 @@ export default function CardViews({
 					variant={"outline"}
 					className='w-full border-green-500 text-green-500 hover:bg-green-50 h-10 text-sm'
 					onClick={() => {
-						if (itemFromCart?.addedToCart) {
-							const result: boolean = handle_RemoveFromCart(item.nama);
-							if (result) {
-								signalFromCard("berhasil buang barang dari keranjang!", true);
-							} else {
-								signalFromCard("aduhhh... kebelet eek", false);
-							}
-						} else {
-							handle_AddToCart(item);
-						}
+						handleCartAction();
 					}}>
 					{itemFromCart?.addedToCart ? (
 						<div className='flex flex-row gap-2'>
