@@ -26,7 +26,7 @@ interface EnhancedSearchProps {
 	onReset?: () => void;
 	onclick?: () => void;
 	searchHistory?: string[];
-	dataFound?: FoundBarang[] | boolean;
+	dataFound?: FoundBarang[] | null;
 	isLoading?: boolean;
 	className?: string;
 }

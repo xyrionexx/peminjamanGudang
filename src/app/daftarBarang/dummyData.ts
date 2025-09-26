@@ -1,5 +1,6 @@
 import dummyImage from "../assets/dummy.jpg";
-import { DataBarangType } from "@/types/global";
+import { DataBarangType, FoundBarang } from "@/types/global";
+import SortMap from "../scripts/MyCustomSorting";
 
 export const DataBarang: DataBarangType[] = [
 	{
@@ -163,3 +164,16 @@ export const DataBarang: DataBarangType[] = [
 		kategori: "Komputer",
 	},
 ];
+
+export const MappedDataBarang = new Map<string, FoundBarang[]>();
+for (const item of DataBarang) {
+	const key: string = item.nama[0].toLowerCase();
+	let dataLama: FoundBarang[] | undefined = MappedDataBarang.get(key);
+	if (dataLama == null) {
+		MappedDataBarang.set(key, [item]);
+	} else {
+		dataLama.push(item);
+	}
+}
+
+export const DataBarangSorted: FoundBarang[][] = SortMap(DataBarang);

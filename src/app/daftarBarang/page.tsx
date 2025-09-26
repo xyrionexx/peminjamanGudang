@@ -12,11 +12,10 @@ import { toast } from "sonner";
 import * as Pagination from "@/components/ui/pagination";
 
 // IMPORT MILIK SENDIRI / KITA
-import { DataBarang } from "./dummyData";
-import { B_Search } from "./Binary-Search";
+import { DataBarang, MappedDataBarang } from "./dummyData";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
-import type { DataBarangType, FoundBarang } from "@/types/global";
+import type { FoundBarang } from "@/types/global";
 import Footer from "@/components/footer";
 import MainNavbar from "@/components/NavbarMain";
 
@@ -84,7 +83,10 @@ export default function DaftarBarang() {
 	);
 
 	// HOOKS FOR SEARCH RESULT
-	const [searchBarang, setSearchBarang] = useState<number[]>();
+	const [searchBarang, setSearchBarang] = useState<{
+		kategori: string;
+		id: number[];
+	}>();
 
 	// HOOKS FOR CART / KERANJANG
 	const [barangKeranjang, setBarangKeranjang] = useState<Map<
@@ -117,14 +119,17 @@ export default function DaftarBarang() {
 
 	// MENGAMBIL HASIL SEARCH DARI URL PARAMETER
 	useEffect(() => {
-		const params: URLSearchParams = new URLSearchParams(window.location.search);
-		const barangParam: string | null = params.get("barang");
-		if (barangParam == null) return;
-		setSearchBarang(
-			barangParam
-				.split(",")
-				.map((indexBarang: string) => Number(indexBarang))
-		);
+		window.addEventListener("PencarianBarangDitemukan", () => {
+			const params: URLSearchParams = new URLSearchParams(window.location.search);
+			const kategori: string | null = params.get("cat");
+			const barangParam: string | null = params.get("barang");
+	
+			if (barangParam == null || kategori == null) return;
+			setSearchBarang({
+				kategori: kategori,
+				id: barangParam?.split(",").map((id: string) => Number(id)),
+			});
+		});
 	}, []);
 
 	// NGECEK STATUS PENGGUNA
@@ -190,7 +195,22 @@ export default function DaftarBarang() {
 				{/* DAFTAR BARANG */}
 				<div className='flex flex-wrap shrink-0 gap-10 justify-center'>
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
+						{searchBarang?.id?.map((id) => {
+							const barangList: FoundBarang[] | undefined =
+								MappedDataBarang.get(searchBarang.kategori);
+							const barang: FoundBarang | undefined = barangList?.[id];
+							if (!barang) return null; // skip kalau undefined
 
+							return (
+								<div key={barang.id}>
+									<CardViews
+										item={barang}
+										itemFromCart={barangKeranjang?.get(barang.id)}
+										signalFromCard={handleCardSignal}
+									/>
+								</div>
+							);
+						})}
 
 						{/* NGERENDER SELURUH BARANG YANG ADA */}
 						{DataBarang.map((item, index) => {

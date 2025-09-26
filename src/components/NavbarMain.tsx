@@ -10,11 +10,6 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 // SHADCN
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "./ui/separator";
-import {
-	Popover,
-	PopoverTrigger,
-	PopoverContent,
-} from "@radix-ui/react-popover";
 
 // ICON
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -24,8 +19,9 @@ import ProfileMenu from "./ProfileMenu";
 import { EnhancedSearch } from "./search";
 import CartSidebarBtn from "./CartSidebarBtn";
 import { B_Search } from "@/app/daftarBarang/Binary-Search";
-import { DataBarang } from "@/app/daftarBarang/dummyData";
+import { MappedDataBarang } from "@/app/daftarBarang/dummyData";
 import { FoundBarang } from "@/types/global";
+import { BarangEvent } from "@/lib/LocalStorageEvent";
 
 export default function MainNavbar() {
 	// HOOKS
@@ -33,9 +29,7 @@ export default function MainNavbar() {
 	const router: AppRouterInstance = useRouter();
 
 	// DATA SEARCH REQUIREMENTS (HOOKS)
-	const [dataFound, setDataFound] = useState<FoundBarang[] | boolean>(
-		[]
-	);
+	const [dataFound, setDataFound] = useState<FoundBarang[] | null>([]);
 	const [searchHistory, setSearchHistory] = useState<string[]>([
 		"laptop",
 		"wong saya sukak kok",
@@ -43,17 +37,30 @@ export default function MainNavbar() {
 	]);
 
 	// HANDLERS
-	const handleSearch = (): void => {
+	const handleSearch = (searchValue: string): void => {
+		const huruf: string = searchValue[0].toLowerCase();
+
 		if (!dataFound || !Array.isArray(dataFound)) return;
 		router.push(
 			"/daftarBarang?barang=" +
-				dataFound.map((item: FoundBarang) => item.index).join(",")
+				dataFound.map((item: FoundBarang) => item.index).join(",") +
+				"?cat=" +
+				huruf
 		);
 	};
 
 	const handleSearchOnChange = (searchValue: string): void => {
-		const hasil: FoundBarang[] | boolean = B_Search(DataBarang, searchValue);
+		const huruf: string = searchValue[0].toLowerCase();
+		const daerahSearchBarang: FoundBarang[] | undefined =
+			MappedDataBarang.get(huruf);
+
+		if (daerahSearchBarang == null) return;
+		const hasil: FoundBarang[] | null = B_Search(
+			daerahSearchBarang,
+			searchValue
+		);
 		setDataFound(hasil);
+		BarangEvent({judulEvent: "PencarianBarangDitemukan"});
 	};
 
 	const handleReset = (): void => {

@@ -50,5 +50,5 @@ export function B_Search(daftarBarang: DataBarangType[], input: string) {
 		middle = count_mid(low, high);
 	}
 
-	return false;
+	return null;
 }
