@@ -33,14 +33,12 @@ type cartEventTypes = {
 
 export default function DaftarBarang() {
 	// STATE //
-	// ANOTHER HOOK TOOLS
+	// ANOTHER STATE TOOLS
 	//==========================
 	const { data: session, status } = useSession();
 	const router: AppRouterInstance = useRouter();
-	//============================
 
-	// HOOKS FOR CATEGORY
-	//==========================
+	// STATE FOR CATEGORY
 	let [selectedCategory, setSelectedCategory] = useState<string[]>([]);
 	const [category, setCategory] = useState<{ name: string; status: boolean }[]>(
 		[
@@ -74,29 +72,47 @@ export default function DaftarBarang() {
 			},
 		]
 	);
-	//==========================
 
-	// HOOKS FOR SEARCH RESULT
-	const [searchBarang, setSearchBarang] = useState<{
-		kategori: string;
-		id: number[];
-	}| undefined>();
+	// STATE FOR SEARCH RESULT
+	const [searchBarang, setSearchBarang] = useState<
+		| {
+				kategori: string;
+				id: number[];
+		  }
+		| undefined
+	>();
 
-	// HOOKS FOR CART / KERANJANG
+	// STATE FOR CART / KERANJANG
 	const [barangKeranjang, setBarangKeranjang] = useState<Map<
 		number,
 		FoundBarang
 	> | null>();
-	// END OF STATES //
+	//==========================
+	/// END OF STATES ///
 
-	// HOOK HANDLERS / LIFECYCLES //
+	// STATE HANDLERS / LIFECYCLES //
 	// AMBIL BARANG AWAL DARI KERANJANG
+	//===================================
 	useEffect(() => {
 		setBarangKeranjang(getBarangKeranjang());
 	}, []);
 
+	// AMBIL HASIL PERCARIAN (NON EVENT)
+	useEffect(() => { 
+		const params: URLSearchParams = new URLSearchParams(window.location.search);
+
+		const kategori: string | null = params.get("cat");
+		const barangParam: string | null = params.get("barang");
+
+		if (barangParam == null || kategori == null) return;
+
+		setSearchBarang({
+			kategori: kategori,
+			id: barangParam?.split(",").map((id: string) => Number(id)),
+		});
+	}, [])
+
 	// EVENT
-	//===================================
 	// NANGKEP EVENT KETIKA HABIS MASUKAN BARANG KE KERANJANG
 	useEffect(() => {
 		window.addEventListener("cartUpdate", (event: Event) => {
@@ -113,6 +129,7 @@ export default function DaftarBarang() {
 			}
 		});
 	}, []);
+
 	// NANGKEP EVENT DAN MENGAMBIL HASIL SEARCH DARI URL PARAMETER
 	useEffect(() => {
 		window.addEventListener("PencarianBarangDitemukan", () => {
@@ -131,11 +148,13 @@ export default function DaftarBarang() {
 			});
 		});
 	}, []);
+
+	// NANGKEP EVENT DAN RESET PENCARIAN DAN BARANG HASIL PENCARIAN
 	useEffect(() => {
 		window.addEventListener("resetPencarian", () => {
 			setSearchBarang(undefined);
-		})
-	}, [])
+		});
+	}, []);
 	//===============================================
 
 	// ACCOUNT CHECKER
@@ -146,12 +165,13 @@ export default function DaftarBarang() {
 			router.push("/signin?callbackUrl=/daftarBarang");
 		}
 	}, [status, router]);
+
 	// LOADING PAS LAGI NGECEK
 	if (status === "loading") {
 		return loading_circle();
 	}
 	//=======================
-	// END OF HOOK HANDLERS //
+	// END OF STATE HANDLERS //
 
 	// HANLDERS //
 	// CATEGORY
@@ -166,6 +186,7 @@ export default function DaftarBarang() {
 		}
 		category.status = !category.status;
 	};
+
 	// HANDLE CLEAR ALL CATEGORY
 	const handleClearAll = (): void => {
 		setSelectedCategory([]);

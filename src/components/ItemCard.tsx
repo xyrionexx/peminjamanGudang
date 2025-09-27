@@ -1,16 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { DataBarangType, FoundBarang } from "@/types/global";
+import { FoundBarang } from "@/types/global";
 import { Icon } from "@iconify/react";
 import { handle_RemoveFromCart } from "@/scripts/cartHandler";
+import { useState } from "react";
 
 type itemTypeProps = {
 	barang: FoundBarang;
 	getBarang: () => void;
-}
+};
 
-export default function ItemCard(
-	{barang, getBarang}: itemTypeProps
-) {
+export default function ItemCard({ barang, getBarang }: itemTypeProps) {
+	// STATES
+	let [itemQuantity, setItemQuantity] = useState(0);
+
 	return (
 		<div className='bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-green-500 transition-all duration-200 p-4'>
 			<div className='flex items-center gap-4'>
@@ -31,7 +33,7 @@ export default function ItemCard(
 						{barang.nama}
 					</h3>
 					<p className='text-sm text-gray-500 leading-relaxed line-clamp-2'>
-                        {barang.desc}
+						{barang.desc}
 					</p>
 				</div>
 
@@ -45,8 +47,7 @@ export default function ItemCard(
 						onClick={() => {
 							handle_RemoveFromCart(barang.nama);
 							getBarang();
-						}}
-					>
+						}}>
 						<Icon
 							icon='solar:trash-bin-2-line-duotone'
 							width='20'
@@ -59,7 +60,8 @@ export default function ItemCard(
 						<Button
 							variant='ghost'
 							size='icon'
-							className='h-8 w-8 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors duration-200'>
+							className='h-8 w-8 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors duration-200'
+							onClick={() => setItemQuantity((prevNum) => prevNum - 1)}>
 							<Icon
 								icon='ic:baseline-minus'
 								width='16'
@@ -68,13 +70,14 @@ export default function ItemCard(
 						</Button>
 
 						<span className='px-3 py-1 text-sm font-medium text-gray-900 min-w-[2rem] text-center'>
-							2
+							{itemQuantity}
 						</span>
 
 						<Button
 							variant='ghost'
 							size='icon'
-							className='h-8 w-8 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors duration-200'>
+							className='h-8 w-8 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors duration-200'
+							onClick={() => setItemQuantity((prevNum) => prevNum + 1)}>
 							<Icon
 								icon='ic:baseline-plus'
 								width='16'
