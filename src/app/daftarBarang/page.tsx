@@ -16,7 +16,7 @@ import * as Pagination from "@/components/ui/pagination";
 
 // IMPORT MILIK SENDIRI / KITA
 //==========================
-import { getBarangKeranjang } from "../scripts/cartHandler";
+import { getBarangKeranjang } from "@/scripts/cartHandler";
 import { DataBarang, MappedDataBarang } from "./dummyData";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
@@ -80,7 +80,7 @@ export default function DaftarBarang() {
 	const [searchBarang, setSearchBarang] = useState<{
 		kategori: string;
 		id: number[];
-	}>();
+	}| undefined>();
 
 	// HOOKS FOR CART / KERANJANG
 	const [barangKeranjang, setBarangKeranjang] = useState<Map<
@@ -119,6 +119,7 @@ export default function DaftarBarang() {
 			const params: URLSearchParams = new URLSearchParams(
 				window.location.search
 			);
+
 			const kategori: string | null = params.get("cat");
 			const barangParam: string | null = params.get("barang");
 
@@ -130,6 +131,11 @@ export default function DaftarBarang() {
 			});
 		});
 	}, []);
+	useEffect(() => {
+		window.addEventListener("resetPencarian", () => {
+			setSearchBarang(undefined);
+		})
+	}, [])
 	//===============================================
 
 	// ACCOUNT CHECKER
@@ -180,54 +186,52 @@ export default function DaftarBarang() {
 				{/* DAFTAR BARANG */}
 				<div className='flex flex-wrap shrink-0 gap-10 justify-center'>
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
-						{/* NGERENDER HASIL PENCARIAN BARANG */}
-						{searchBarang?.id?.map((id) => {
-							const barangList: FoundBarang[] | undefined =
-								MappedDataBarang.get(searchBarang.kategori);
-							const barang: FoundBarang | undefined = barangList?.[id];
+						{/* KALAU ADA HASIL PENCARIAN, PRIORITASKAN TAMPILKAN ITU */}
+						{searchBarang?.id && searchBarang.id.length > 0
+							? searchBarang.id.map((id) => {
+									const barangList: FoundBarang[] | undefined =
+										MappedDataBarang.get(searchBarang.kategori);
+									const barang: FoundBarang | undefined = barangList?.[id];
 
-							if (!barang) return null; // skip kalau undefined
+									if (!barang) return null; // skip kalau undefined
 
-							return (
-								<div key={barang.id}>
-									<CardViews
-										item={barang}
-										itemFromCart={barangKeranjang?.get(barang.id)}
-									/>
-								</div>
-							);
-						})}
+									return (
+										<div key={barang.id}>
+											<CardViews
+												item={barang}
+												itemFromCart={barangKeranjang?.get(barang.id)}
+											/>
+										</div>
+									);
+							  })
+							: /* KALAU TIDAK ADA PENCARIAN, RENDER SEMUA BARANG ATAU FILTER KATEGORI */
+							  DataBarang.map((item) => {
+									// kalau kategori nggak dipilih, tampilkan semua
+									if (selectedCategory.length === 0) {
+										return (
+											<div key={item.id}>
+												<CardViews
+													item={item}
+													itemFromCart={barangKeranjang?.get(item.id)}
+												/>
+											</div>
+										);
+									}
 
-						{/* NGERENDER SELURUH BARANG YANG ADA */}
-						{DataBarang.map((item, index) => {
-							// NGERENDER SELURUH BARANG YANG ADA
-							if (selectedCategory.length === 0) {
-								return (
-									<div key={item.id}>
-										<CardViews
-											item={item}
-											itemFromCart={barangKeranjang?.get(item.id)}></CardViews>
-									</div>
-								);
-							}
+									// kalau kategori dipilih, tampilkan yang match
+									if (selectedCategory.includes(item.kategori)) {
+										return (
+											<div key={item.id}>
+												<CardViews
+													item={item}
+													itemFromCart={barangKeranjang?.get(item.id)}
+												/>
+											</div>
+										);
+									}
 
-							// NGERENDER SELURUH BARANG BERDASARKAN KATEGORI
-							if (
-								selectedCategory.length > 0 &&
-								selectedCategory.includes(item.kategori)
-							) {
-								return (
-									<div key={item.id}>
-										<CardViews
-											item={item}
-											itemFromCart={barangKeranjang?.get(index)}></CardViews>
-									</div>
-								);
-							}
-
-							// KALO NGGA ADA BARANG SAMA SEKALI YA RETURN NULL
-							return null;
-						})}
+									return null;
+							  })}
 					</div>
 				</div>
 

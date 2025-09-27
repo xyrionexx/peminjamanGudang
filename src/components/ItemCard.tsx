@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { DataBarangType, FoundBarang } from "@/types/global";
 import { Icon } from "@iconify/react";
-import { handle_RemoveFromCart } from "./CardViews";
+import { handle_RemoveFromCart } from "@/scripts/cartHandler";
 
 type itemTypeProps = {
 	barang: FoundBarang;

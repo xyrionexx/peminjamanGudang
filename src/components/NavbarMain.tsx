@@ -20,7 +20,7 @@ import ProfileMenu from "./ProfileMenu";
 import CartSidebarBtn from "./CartSidebarBtn";
 // FUNCTIONS
 import { EnhancedSearch } from "./search";
-import { B_Search } from "@/app/scripts/Binary-Search";
+import { B_Search } from "@/scripts/Binary-Search";
 import { MappedDataBarang } from "@/app/daftarBarang/dummyData";
 import { FoundBarang } from "@/types/global";
 import { BarangEvent } from "@/lib/LocalStorageEvent";
@@ -47,7 +47,7 @@ export default function MainNavbar() {
 		router.push(
 			"/daftarBarang?barang=" +
 				dataFound.map((item: FoundBarang) => item.index).join(",") +
-				"?cat=" +
+				"&cat=" +
 				huruf
 		);
 
@@ -72,6 +72,8 @@ export default function MainNavbar() {
 
 	const handleReset = (): void => {
 		setDataFound([]);
+		BarangEvent({ judulEvent: "resetPencarian" });
+		router.push("/daftarBarang");
 	};
 
 	return (

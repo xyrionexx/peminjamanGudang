@@ -172,5 +172,6 @@ for (const item of DataBarang) {
 		MappedDataBarang.set(key, [item]);
 	} else {
 		dataLama.push(item);
+		dataLama.sort((a, b) => a.nama.localeCompare(b.nama));
 	}
 }

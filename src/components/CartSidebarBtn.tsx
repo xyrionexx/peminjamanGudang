@@ -27,7 +27,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { EnhancedSearch } from "./search";
 import { DataBarangType, FoundBarang } from "@/types/global";
 import ItemCard from "./ItemCard";
-import { B_Search } from "@/app/scripts/Binary-Search";
+import { B_Search } from "@/scripts/Binary-Search";
 
 export default function CartSidebarBtn(): JSX.Element {
 	// HOOKS

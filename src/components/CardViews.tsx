@@ -28,7 +28,7 @@ import notification from "./notification";
 //==========================
 // FUNCTIONS
 //==========================
-import { handle_RemoveFromCart } from "@/app/scripts/cartHandler";
+import { handle_RemoveFromCart } from "@/scripts/cartHandler";
 import { insertBarangEvent } from "../lib/LocalStorageEvent";
 //==========================
 // IMPORT TYPE
