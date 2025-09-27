@@ -1,25 +1,29 @@
 "use client";
 
 // TOOLS REACT / NEXT
+//==========================
 import { Icon } from "@iconify/react";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+//==========================
 
 // SHADCN
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+//==========================
+import * as Pagination from "@/components/ui/pagination";
+//==========================
 
 // IMPORT MILIK SENDIRI / KITA
-import { DataBarang } from "./dummyData";
-import { B_Search } from "./Binary-Search";
-import { EnhancedSearch } from "@/components/search";
+//==========================
+import { getBarangKeranjang } from "@/scripts/cartHandler";
+import { DataBarang, MappedDataBarang } from "./dummyData";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
-import type { DataBarangType, FoundBarang } from "@/types/global";
-import ProfileMenu from "@/components/ProfileMenu";
-import CartSidebarBtn from "@/components/CartSidebarBtn";
+import type { FoundBarang } from "@/types/global";
+import Footer from "@/components/footer";
+import MainNavbar from "@/components/NavbarMain";
+//==========================
 
 // TYPES
 type cartEventTypes = {
@@ -27,29 +31,14 @@ type cartEventTypes = {
 	newValue: FoundBarang[];
 };
 
-// EXPORT FUNCTION
-export const getBarangKeranjang = (): Map<number, FoundBarang> | null => {
-	if (typeof window === "undefined") return null;
-
-	const barangKeranjang: FoundBarang[] | null = JSON.parse(
-		localStorage.getItem("cart") ?? "[]"
-	);
-
-	if (barangKeranjang === null) {
-		return null;
-	}
-
-	return new Map(
-		barangKeranjang?.map((barang: FoundBarang) => [barang.id, barang])
-	);
-};
-
 export default function DaftarBarang() {
-	// ANOTHER HOOK TOOLS
+	// STATE //
+	// ANOTHER STATE TOOLS
+	//==========================
 	const { data: session, status } = useSession();
-	const router = useRouter();
+	const router: AppRouterInstance = useRouter();
 
-	// HOOKS FOR CATEGORY
+	// STATE FOR CATEGORY
 	let [selectedCategory, setSelectedCategory] = useState<string[]>([]);
 	const [category, setCategory] = useState<{ name: string; status: boolean }[]>(
 		[
@@ -84,26 +73,48 @@ export default function DaftarBarang() {
 		]
 	);
 
-	// HOOKS FOR SEARCH RESULT
-	const [dataFound, setDataFound] = useState<number | DataBarangType[] | null>(
-		null
-	);
-	const [isFound, setIsFound] = useState<boolean>(false);
+	// STATE FOR SEARCH RESULT
+	const [searchBarang, setSearchBarang] = useState<
+		| {
+				kategori: string;
+				id: number[];
+		  }
+		| undefined
+	>();
 
-	// HOOKS FOR CART / KERANJANG
+	// STATE FOR CART / KERANJANG
 	const [barangKeranjang, setBarangKeranjang] = useState<Map<
 		number,
 		FoundBarang
 	> | null>();
+	//==========================
+	/// END OF STATES ///
 
-	// HOOK HANDLERS
+	// STATE HANDLERS / LIFECYCLES //
+	// AMBIL BARANG AWAL DARI KERANJANG
+	//===================================
 	useEffect(() => {
-		// AMBIL BARANG DARI KERANJANG
 		setBarangKeranjang(getBarangKeranjang());
 	}, []);
 
+	// AMBIL HASIL PERCARIAN (NON EVENT)
+	useEffect(() => { 
+		const params: URLSearchParams = new URLSearchParams(window.location.search);
+
+		const kategori: string | null = params.get("cat");
+		const barangParam: string | null = params.get("barang");
+
+		if (barangParam == null || kategori == null) return;
+
+		setSearchBarang({
+			kategori: kategori,
+			id: barangParam?.split(",").map((id: string) => Number(id)),
+		});
+	}, [])
+
+	// EVENT
+	// NANGKEP EVENT KETIKA HABIS MASUKAN BARANG KE KERANJANG
 	useEffect(() => {
-		// NANGKEP EVENT KETIKA HABIS MASUKAN BARANG KE KERANJANG
 		window.addEventListener("cartUpdate", (event: Event) => {
 			const customEvent = event as CustomEvent<cartEventTypes>;
 			if (customEvent.detail.key === "cart") {
@@ -117,23 +128,54 @@ export default function DaftarBarang() {
 				);
 			}
 		});
-	});
+	}, []);
 
-	// ACCOUNT LOG IN / LOG OUT VALIDATION
+	// NANGKEP EVENT DAN MENGAMBIL HASIL SEARCH DARI URL PARAMETER
+	useEffect(() => {
+		window.addEventListener("PencarianBarangDitemukan", () => {
+			const params: URLSearchParams = new URLSearchParams(
+				window.location.search
+			);
+
+			const kategori: string | null = params.get("cat");
+			const barangParam: string | null = params.get("barang");
+
+			if (barangParam == null || kategori == null) return;
+
+			setSearchBarang({
+				kategori: kategori,
+				id: barangParam?.split(",").map((id: string) => Number(id)),
+			});
+		});
+	}, []);
+
+	// NANGKEP EVENT DAN RESET PENCARIAN DAN BARANG HASIL PENCARIAN
+	useEffect(() => {
+		window.addEventListener("resetPencarian", () => {
+			setSearchBarang(undefined);
+		});
+	}, []);
+	//===============================================
+
+	// ACCOUNT CHECKER
+	//======================
+	// NGECEK STATUS AKUN PENGGUNA
+	useEffect(() => {
+		if (status === "unauthenticated") {
+			router.push("/signin?callbackUrl=/daftarBarang");
+		}
+	}, [status, router]);
+
+	// LOADING PAS LAGI NGECEK
 	if (status === "loading") {
 		return loading_circle();
 	}
-	if (status === "unauthenticated") {
-		router.push("/signin?callbackUrl=/daftarBarang");
-	}
+	//=======================
+	// END OF STATE HANDLERS //
 
-	// NON HOOKS DATA (STATIC)
-	// DATA BARANG SORTED VERSION
-	const SortedBarangAZ: DataBarangType[] = DataBarang.sort((a, b) => {
-		return a.nama.toLowerCase().localeCompare(b.nama.toLowerCase());
-	});
-
-	// HANLDERS
+	// HANLDERS //
+	// CATEGORY
+	//=======================
 	const handleCategory = (category: { name: string; status: boolean }) => {
 		if (selectedCategory.includes(category.name)) {
 			setSelectedCategory((prev) =>
@@ -145,192 +187,119 @@ export default function DaftarBarang() {
 		category.status = !category.status;
 	};
 
+	// HANDLE CLEAR ALL CATEGORY
 	const handleClearAll = (): void => {
 		setSelectedCategory([]);
 		category.forEach((item) => {
 			item.status = false;
 		});
 	};
-
-	const handleSearch = (searchValue: string): void => {
-		if (searchValue.length === 0) {
-			setIsFound(false);
-			setDataFound(null);
-			return;
-		}
-
-		const result: FoundBarang[] | null = B_Search(SortedBarangAZ, searchValue);
-		if (result === null) return;
-		setDataFound(result);
-		setIsFound(true);
-		console.log(result);
-	};
-
-	const handleReset = () => {
-		setIsFound(false);
-		setDataFound([]);
-		return;
-	};
-
-	const handleCardSignal = (pesan: string, ok: boolean) => {
-		toast(pesan, {
-			icon: ok ? (
-				<Icon
-					icon='teenyicons:tick-circle-outline'
-					width='15'
-					height='15'
-				/>
-			) : (
-				<Icon
-					icon='f7:exclamationmark'
-					width='56'
-					height='56'
-				/>
-			),
-			duration: 2000,
-			position: "bottom-center",
-			richColors: true,
-		});
-	};
-
-	const handleUpdateCart = () => {
-		setBarangKeranjang(getBarangKeranjang());
-	};
+	//==========================
+	// END OF HANDLERS //
 
 	return (
 		<>
 			{/* NAVBAR */}
-			<div className='fixed top-0 left-0 right-0 z-50 bg-white shadow-md'>
-				<div className='navbar flex items-center justify-center py-4'>
-					<div className='searchMenu flex items-center justify-center mx-auto gap-5'>
-						{/* AVATAR */}
-						<div className='flex gap-3 justify-center items-center'>
-							<Avatar>
-								<AvatarImage
-									src={
-										session?.user.image ??
-										"https://avatar.iran.liara.run/public"
-									}
-								/>
-								<AvatarFallback>ID</AvatarFallback>
-							</Avatar>
-
-							<p className='flex shrink-0 whitespace-nowrap'>
-								{session?.user.name}
-							</p>
-
-							<ProfileMenu />
-						</div>
-
-						{/* SEARCH BAR */}
-						<div className='search flex w-full max-w-lg pr-2'>
-							<EnhancedSearch
-								placeholder='Mangga cari barang disini'
-								onSearch={handleSearch}
-								onReset={handleReset}
-								className='w-full'
-							/>
-						</div>
-
-						{/* KATEGORI */}
-						<div className='menu flex gap-5 items-center'>
-							<div className='kategori'>
-								<ul className='flex text-black gap-5'>
-									{/* TOMBOL RESET KATEGORI */}
-									{(() => {
-										if (selectedCategory.length > 0) {
-											return (
-												<Button
-													variant='destructive'
-													size='sm'
-													onClick={handleClearAll}>
-													Clear all
-												</Button>
-											);
-										}
-									})()}
-
-									{/* TOMBOL-TOMBOL KATEGORI */}
-									{category.map((item) => (
-										<li key={item.name}>
-											<Button
-												variant={item.status ? "default" : "outline"}
-												size='sm'
-												onClick={() => {
-													handleCategory(item);
-												}}
-												className='hover:text-gray-600 transition-colors'>
-												{item.name}
-											</Button>
-										</li>
-									))}
-								</ul>
-							</div>
-
-							{/* TOMBOL KERANGJANG SIDE RIGHT BAR */}
-							<div className='pinjam'>
-								<CartSidebarBtn />
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+			<MainNavbar />
 
 			{/* MAIN CONTENT */}
-			<div className='DaftarBarang flex flex-col gap-4 py-20'>
-				<div className='dataBarang flex flex-col'>
-					<div className='daftarBaran flex flex-wrap shrink-0 gap-10 justify-center'>
-						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
-							{/* NGERENDER HASIL PENCARIAN BARANG */}
-							{isFound &&
-								Array.isArray(dataFound) &&
-								dataFound.map((item, index) => (
-									<div key={item.id}>
-										<CardViews
-											item={item}
-											itemFromCart={barangKeranjang?.get(index)}
-											signalFromCard={handleCardSignal}
-										/>
-									</div>
-								))}
+			<div className='flex flex-col py-20'>
+				{/* DAFTAR BARANG */}
+				<div className='flex flex-wrap shrink-0 gap-10 justify-center'>
+					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
+						{/* KALAU ADA HASIL PENCARIAN, PRIORITASKAN TAMPILKAN ITU */}
+						{searchBarang?.id && searchBarang.id.length > 0
+							? searchBarang.id.map((id) => {
+									const barangList: FoundBarang[] | undefined =
+										MappedDataBarang.get(searchBarang.kategori);
+									const barang: FoundBarang | undefined = barangList?.[id];
 
-							{/* NGERENDER SELURUH BARANG YANG ADA */}
-							{!isFound &&
-								DataBarang.map((item, index) => {
-									// NGERENDER SELURUH BARANG YANG ADA
+									if (!barang) return null; // skip kalau undefined
+
+									return (
+										<div key={barang.id}>
+											<CardViews
+												item={barang}
+												itemFromCart={barangKeranjang?.get(barang.id)}
+											/>
+										</div>
+									);
+							  })
+							: /* KALAU TIDAK ADA PENCARIAN, RENDER SEMUA BARANG ATAU FILTER KATEGORI */
+							  DataBarang.map((item) => {
+									// kalau kategori nggak dipilih, tampilkan semua
 									if (selectedCategory.length === 0) {
 										return (
 											<div key={item.id}>
 												<CardViews
 													item={item}
 													itemFromCart={barangKeranjang?.get(item.id)}
-													signalFromCard={handleCardSignal}></CardViews>
+												/>
 											</div>
 										);
 									}
 
-									// NGERENDER SELURUH BARANG BERDASARKAN KATEGORI
-									if (
-										selectedCategory.length > 0 &&
-										selectedCategory.includes(item.kategori)
-									) {
+									// kalau kategori dipilih, tampilkan yang match
+									if (selectedCategory.includes(item.kategori)) {
 										return (
 											<div key={item.id}>
 												<CardViews
 													item={item}
-													itemFromCart={barangKeranjang?.get(index)}
-													signalFromCard={handleCardSignal}></CardViews>
+													itemFromCart={barangKeranjang?.get(item.id)}
+												/>
 											</div>
 										);
 									}
 
-									// KALO NGGA ADA BARANG SAMA SEKALI YA RETURN NULL
 									return null;
-								})}
-						</div>
+							  })}
 					</div>
 				</div>
+
+				{/* PAGINATION */}
+				<div className='mt-10'>
+					<Pagination.Pagination>
+						<Pagination.PaginationContent>
+							{/* PREVIOUS PAGE */}
+							<Pagination.PaginationItem>
+								<Pagination.PaginationPrevious href='#' />
+							</Pagination.PaginationItem>
+
+							{/* NUMBER SELECTION OF PAGES */}
+							<Pagination.PaginationItem>
+								<Pagination.PaginationLink
+									href='#'
+									isActive>
+									1
+								</Pagination.PaginationLink>
+							</Pagination.PaginationItem>
+							<Pagination.PaginationItem>
+								<Pagination.PaginationLink href='#'>
+									2
+								</Pagination.PaginationLink>
+							</Pagination.PaginationItem>
+							<Pagination.PaginationItem>
+								<Pagination.PaginationLink href='#'>
+									3
+								</Pagination.PaginationLink>
+							</Pagination.PaginationItem>
+
+							{/* TITIK-TITIK */}
+							<Pagination.PaginationItem>
+								<Pagination.PaginationEllipsis />
+							</Pagination.PaginationItem>
+
+							{/* NEXT PAGE */}
+							<Pagination.PaginationItem>
+								<Pagination.PaginationNext href='#' />
+							</Pagination.PaginationItem>
+						</Pagination.PaginationContent>
+					</Pagination.Pagination>
+				</div>
 			</div>
+
+			{/* FOOTER */}
+			<Footer />
 		</>
 	);
 }

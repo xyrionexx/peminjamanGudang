@@ -1,3 +1,4 @@
+// SHADCN
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -8,9 +9,11 @@ import {
 	DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 
-import { Button } from "./ui/button";
-
+// ICONS
 import { Icon } from "@iconify/react/dist/iconify.js";
+
+// REACT
+import { signOut } from "next-auth/react";
 
 export default function ProfileMenu() {
 	return (
@@ -62,7 +65,7 @@ export default function ProfileMenu() {
 						/>
 						Pindah Akun
 					</DropdownMenuItem>
-					<DropdownMenuItem className='text-red-500'>
+					<DropdownMenuItem className='text-red-500' onClick={() => signOut()}>
 						<Icon
 							icon='mingcute:exit-line'
 							width='24'

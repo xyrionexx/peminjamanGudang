@@ -10,3 +10,20 @@ export function insertBarangEvent(key: string, value: FoundBarang[]) {
 		})
 	);
 }
+
+interface BarangEventType {
+	judulEvent: string;
+	key?: string;
+	value?: any;
+}
+
+export function BarangEvent({ judulEvent, key, value }: BarangEventType) {
+	window.dispatchEvent(
+		new CustomEvent(judulEvent, {
+			detail: {
+				key: key,
+				value: value,
+			},
+		})
+	);
+}
