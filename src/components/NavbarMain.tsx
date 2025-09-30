@@ -21,7 +21,7 @@ import CartSidebarBtn from "./CartSidebarBtn";
 // FUNCTIONS
 import { EnhancedSearch } from "./search";
 import { B_Search } from "@/scripts/Binary-Search";
-import { MappedDataBarang } from "@/app/daftarBarang/dummyData";
+import { MappedDataBarang } from "@/data/barangApi";
 import { FoundBarang } from "@/types/global";
 import { BarangEvent } from "@/lib/LocalStorageEvent";
 

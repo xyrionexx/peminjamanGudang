@@ -1,4 +1,4 @@
-import { DataBarang } from "@/app/daftarBarang/dummyData";
+import { DataBarang } from "@/data/barangApi";
 import { FoundBarang } from "@/types/global";
 
 export default function SortMap(data: FoundBarang[]) {
@@ -9,11 +9,12 @@ export default function SortMap(data: FoundBarang[]) {
 	// proses masukkan data ke map
 	for (const item of data) {
 		const key: string = item.nama[0].toLowerCase();
-		let dataLama: FoundBarang[] | undefined = categorizedAlphabetItemName.get(key);
+		let dataLama: FoundBarang[] | undefined =
+			categorizedAlphabetItemName.get(key);
 		if (dataLama == null) {
 			categorizedAlphabetItemName.set(key, [item]);
 		} else {
-			dataLama.push(item); 
+			dataLama.push(item);
 		}
 	}
 

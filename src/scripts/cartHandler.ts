@@ -3,11 +3,13 @@
 //==========================
 import { DataBarangType, FoundBarang } from "@/types/global";
 //==========================
+
 // IMPORT FUNCTIONS
 //==========================
 import { B_Search } from "./Binary-Search";
 import { insertBarangEvent } from "@/lib/LocalStorageEvent";
 //==========================
+
 // IMPORT COMPONENTS/FUNCTION
 //==========================
 import notification from "@/components/notification";

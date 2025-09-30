@@ -2,7 +2,6 @@
 
 // TOOLS REACT / NEXT
 //==========================
-import { Icon } from "@iconify/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,7 +16,7 @@ import * as Pagination from "@/components/ui/pagination";
 // IMPORT MILIK SENDIRI / KITA
 //==========================
 import { getBarangKeranjang } from "@/scripts/cartHandler";
-import { DataBarang, MappedDataBarang } from "./dummyData";
+import { DataBarang, MappedDataBarang } from "../../data/barangApi";
 import CardViews from "@/components/CardViews";
 import { loading_circle } from "@/components/Loading";
 import type { FoundBarang } from "@/types/global";
@@ -34,7 +33,6 @@ type cartEventTypes = {
 export default function DaftarBarang() {
 	// STATE //
 	// ANOTHER STATE TOOLS
-	//==========================
 	const { data: session, status } = useSession();
 	const router: AppRouterInstance = useRouter();
 
@@ -87,18 +85,16 @@ export default function DaftarBarang() {
 		number,
 		FoundBarang
 	> | null>();
-	//==========================
 	/// END OF STATES ///
 
 	// STATE HANDLERS / LIFECYCLES //
 	// AMBIL BARANG AWAL DARI KERANJANG
-	//===================================
 	useEffect(() => {
 		setBarangKeranjang(getBarangKeranjang());
 	}, []);
 
 	// AMBIL HASIL PERCARIAN (NON EVENT)
-	useEffect(() => { 
+	useEffect(() => {
 		const params: URLSearchParams = new URLSearchParams(window.location.search);
 
 		const kategori: string | null = params.get("cat");
@@ -110,7 +106,7 @@ export default function DaftarBarang() {
 			kategori: kategori,
 			id: barangParam?.split(",").map((id: string) => Number(id)),
 		});
-	}, [])
+	}, []);
 
 	// EVENT
 	// NANGKEP EVENT KETIKA HABIS MASUKAN BARANG KE KERANJANG
@@ -155,10 +151,8 @@ export default function DaftarBarang() {
 			setSearchBarang(undefined);
 		});
 	}, []);
-	//===============================================
 
 	// ACCOUNT CHECKER
-	//======================
 	// NGECEK STATUS AKUN PENGGUNA
 	useEffect(() => {
 		if (status === "unauthenticated") {
@@ -170,12 +164,10 @@ export default function DaftarBarang() {
 	if (status === "loading") {
 		return loading_circle();
 	}
-	//=======================
 	// END OF STATE HANDLERS //
 
 	// HANLDERS //
 	// CATEGORY
-	//=======================
 	const handleCategory = (category: { name: string; status: boolean }) => {
 		if (selectedCategory.includes(category.name)) {
 			setSelectedCategory((prev) =>
@@ -194,7 +186,6 @@ export default function DaftarBarang() {
 			item.status = false;
 		});
 	};
-	//==========================
 	// END OF HANDLERS //
 
 	return (
