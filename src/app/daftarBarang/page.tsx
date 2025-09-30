@@ -223,7 +223,7 @@ export default function DaftarBarang() {
 									);
 							  })
 							: /* KALAU TIDAK ADA PENCARIAN, RENDER SEMUA BARANG ATAU FILTER KATEGORI */
-							  dataBarang.map((item) => {
+							  (dataBarang as FoundBarang[]).map((item: FoundBarang) => {
 									// kalau kategori nggak dipilih, tampilkan semua
 									if (selectedCategory.length === 0) {
 										return (

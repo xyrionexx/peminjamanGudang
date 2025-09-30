@@ -30,16 +30,28 @@ import { Heart, Share2, ShoppingCart, Minus, Plus } from "lucide-react";
 import Footer from "@/components/footer";
 import MainNavbar from "@/components/NavbarMain";
 import { FoundBarang } from "@/types/global";
+import { handle_AddToCart, handle_RemoveFromCart } from "@/scripts/cartHandler";
+import SortMap from "@/scripts/MyCustomSorting";
+import { B_Search } from "@/scripts/Binary-Search";
+
+// TYPES
+type cartEventTypes = {
+	key: string;
+	newValue: FoundBarang[];
+};
 
 export default function ProductDetailPage() {
-	// HOOKS
+	// STATE
 	const [selectedImage, setSelectedImage] = useState(0);
 	const [quantity, setQuantity] = useState(1);
 	const [isFavorited, setIsFavorited] = useState(false);
-	const [barang, setBarang] = useState<FoundBarang | null>(null);
+	const [barang, setBarang] = useState<FoundBarang>();
 	const [urlPathname, setURLPathname] = useState<string[]>();
 
-	// HOOK HANDLERS
+	// STATIC DATA / NON STATE
+	let breadCrumbPath: string = "";
+
+	// HOOKS
 	useEffect(() => {
 		setBarang(JSON.parse(localStorage.getItem("barang") ?? "[]"));
 	}, []);
@@ -48,8 +60,12 @@ export default function ProductDetailPage() {
 		setURLPathname(window.location.pathname.split("/"));
 	}, []);
 
-	// STATIC DATA / NON STATE
-	let breadCrumbPath: string = "";
+	// HANDLERS
+	const handleCartActions = () => {
+		barang?.addedToCart
+			? handle_RemoveFromCart(barang.nama)
+			: handle_AddToCart(barang!);
+	};
 
 	return (
 		<div className='min-h-screen bg-background'>
@@ -186,9 +202,27 @@ export default function ProductDetailPage() {
 								<Button
 									variant={"outline"}
 									className='flex-1 border-green-500 text-green-500 hover:bg-green-50 h-10 text-sm'
+									onClick={() => {
+										if (!barang) return;
+										handleCartActions();
+										barang.addedToCart = !barang.addedToCart;
+									}}
 									size='lg'>
-									<ShoppingCart className='h-5 w-5 mr-2' />
-									Masukkan Keranjang
+									{barang?.addedToCart == undefined || !barang?.addedToCart ? (
+										<>
+											<ShoppingCart className='h-5 w-5 mr-2' />
+											Masukkan Keranjang
+										</>
+									) : (
+										<>
+											<Icon
+												icon='pepicons-pop:cart-off'
+												width='20'
+												height='20'
+											/>
+											Buang dari keranjang
+										</>
+									)}
 								</Button>
 
 								{/* WISHLIST */}

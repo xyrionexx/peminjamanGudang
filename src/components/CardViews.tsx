@@ -73,7 +73,7 @@ export default function CardViews({
 		return result;
 	}
 	const getCurrentBarang = (): void => {
-		localStorage.setItem("barang", JSON.stringify(item));
+		localStorage.setItem("barang", JSON.stringify(itemFromCart ?? item));
 	};
 	// END OF FUNCTIONS
 
@@ -101,6 +101,7 @@ export default function CardViews({
 			console.log("gagal menyimpan barang", error);
 		}
 	};
+	
 	const handleCartAction = () => {
 		itemFromCart?.addedToCart
 			? handle_RemoveFromCart(item.nama)
@@ -114,7 +115,7 @@ export default function CardViews({
 			<CardHeader className='p-0 flex-shrink-0'>
 				<div className='relative overflow-hidden rounded-t-lg'>
 					<Image
-						src={item?.gambar || "/placeholder.svg"}
+						src={item?.gambar || "https://picsum.photos/seed/picsum/200"}
 						alt={item?.nama ?? "Item"}
 						width={300}
 						height={200}
