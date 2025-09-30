@@ -21,12 +21,13 @@ import CartSidebarBtn from "./CartSidebarBtn";
 // FUNCTIONS
 import { EnhancedSearch } from "./search";
 import { B_Search } from "@/scripts/Binary-Search";
-import { MappedDataBarang } from "@/data/barangApi";
 import { FoundBarang } from "@/types/global";
 import { BarangEvent } from "@/lib/LocalStorageEvent";
+import { useBarang } from "@/hooks/barangHook";
 
 export default function MainNavbar() {
 	// HOOKS
+	const { dataBarang, mappedDataBarang, isLoading, error } = useBarang();
 	const { data: session } = useSession();
 	const router: AppRouterInstance = useRouter();
 
@@ -58,7 +59,7 @@ export default function MainNavbar() {
 	const handleSearchOnChange = (searchValue: string): void => {
 		const huruf: string = searchValue[0].toLowerCase();
 		const daerahSearchBarang: FoundBarang[] | undefined =
-			MappedDataBarang.get(huruf);
+			mappedDataBarang.get(huruf);
 
 		if (daerahSearchBarang == null) return;
 

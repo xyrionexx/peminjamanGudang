@@ -4,9 +4,7 @@ import "./globals.css";
 
 import SessionClient from "@/components/SessionClient";
 import { Toaster } from "@/components/ui/sonner";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { queryClient } from "@/config/queryClient";
+import { CacheProviders } from "./cacheProviders";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -32,11 +30,10 @@ export default async function RootLayout({
 		<html lang='en'>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<QueryClientProvider client={queryClient}>
+				<CacheProviders>
 					<SessionClient>{children}</SessionClient>
 					<Toaster />
-					<ReactQueryDevtools initialIsOpen={false} />
-				</QueryClientProvider>
+				</CacheProviders>
 			</body>
 		</html>
 	);
