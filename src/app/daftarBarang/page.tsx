@@ -16,12 +16,13 @@ import * as Pagination from "@/components/ui/pagination";
 // IMPORT MILIK SENDIRI / KITA
 //==========================
 import { getBarangKeranjang } from "@/scripts/cartHandler";
-import { DataBarang, MappedDataBarang } from "../../data/barangApi";
 import CardViews from "@/components/CardViews";
-import { loading_circle } from "@/components/Loading";
+import { Loading_circle } from "@/components/Loading";
 import type { FoundBarang } from "@/types/global";
 import Footer from "@/components/footer";
 import MainNavbar from "@/components/NavbarMain";
+import { useBarang } from "@/hooks/barangHook";
+import { ErrorDisplay } from "@/components/ErrorDisplay";
 //==========================
 
 // TYPES
@@ -33,6 +34,7 @@ type cartEventTypes = {
 export default function DaftarBarang() {
 	// STATE //
 	// ANOTHER STATE TOOLS
+	const { dataBarang, mappedDataBarang, isLoading, error } = useBarang();
 	const { data: session, status } = useSession();
 	const router: AppRouterInstance = useRouter();
 
@@ -162,7 +164,7 @@ export default function DaftarBarang() {
 
 	// LOADING PAS LAGI NGECEK
 	if (status === "loading") {
-		return loading_circle();
+		return <Loading_circle />;
 	}
 	// END OF STATE HANDLERS //
 
@@ -198,11 +200,15 @@ export default function DaftarBarang() {
 				{/* DAFTAR BARANG */}
 				<div className='flex flex-wrap shrink-0 gap-10 justify-center'>
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'>
+						{error && <ErrorDisplay	/>}
+
+						{isLoading && <Loading_circle />}
+
 						{/* KALAU ADA HASIL PENCARIAN, PRIORITASKAN TAMPILKAN ITU */}
-						{searchBarang?.id && searchBarang.id.length > 0
+						{!isLoading && searchBarang?.id && searchBarang.id.length > 0
 							? searchBarang.id.map((id) => {
 									const barangList: FoundBarang[] | undefined =
-										MappedDataBarang.get(searchBarang.kategori);
+										mappedDataBarang.get(searchBarang.kategori);
 									const barang: FoundBarang | undefined = barangList?.[id];
 
 									if (!barang) return null; // skip kalau undefined
@@ -217,7 +223,7 @@ export default function DaftarBarang() {
 									);
 							  })
 							: /* KALAU TIDAK ADA PENCARIAN, RENDER SEMUA BARANG ATAU FILTER KATEGORI */
-							  DataBarang.map((item) => {
+							  dataBarang.map((item) => {
 									// kalau kategori nggak dipilih, tampilkan semua
 									if (selectedCategory.length === 0) {
 										return (

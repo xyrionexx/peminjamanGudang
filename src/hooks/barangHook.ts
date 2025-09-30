@@ -44,7 +44,8 @@ export function useBarang() {
 		return map;
     }, [dataBarang]);
     
-    return {
+	return {
+		dataBarang,
         mappedDataBarang,
         isLoading,
         error

@@ -1,6 +1,6 @@
 import { JSX } from "react";
 
-export const loading_circle = (): JSX.Element => {
+export const Loading_circle = (): JSX.Element => {
 	return (
 		<div className='flex items-center justify-center min-h-[200px]'>
 			<div className='flex flex-col items-center space-y-4'>
