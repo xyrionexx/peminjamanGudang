@@ -1,6 +1,6 @@
 export interface DataBarangType {
 	id: number;
-	gambar?: StaticImageData;
+	gambar?: StaticImageData | string;
 	nama: string;
 	desc: string;
 	stok: number;

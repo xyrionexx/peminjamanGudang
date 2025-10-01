@@ -31,14 +31,7 @@ import Footer from "@/components/footer";
 import MainNavbar from "@/components/NavbarMain";
 import { FoundBarang } from "@/types/global";
 import { handle_AddToCart, handle_RemoveFromCart } from "@/scripts/cartHandler";
-import SortMap from "@/scripts/MyCustomSorting";
-import { B_Search } from "@/scripts/Binary-Search";
-
-// TYPES
-type cartEventTypes = {
-	key: string;
-	newValue: FoundBarang[];
-};
+import { preconnect } from "react-dom";
 
 export default function ProductDetailPage() {
 	// STATE
@@ -119,7 +112,7 @@ export default function ProductDetailPage() {
 					<div className='space-y-4'>
 						<div className='aspect-square bg-card rounded-lg overflow-hidden'>
 							<img
-								src='https://placehold.co/200'
+								src={barang?.gambar || "https://picsum.photos/seed/picsum/200"}
 								alt='Product'
 								className='w-full h-full object-cover'
 							/>
@@ -205,7 +198,14 @@ export default function ProductDetailPage() {
 									onClick={() => {
 										if (!barang) return;
 										handleCartActions();
-										barang.addedToCart = !barang.addedToCart;
+										setBarang((prev: FoundBarang | undefined) => {
+											if (!prev) return prev;
+
+											return {
+												...prev,
+												addedToCart: !prev.addedToCart,
+											};
+										});
 									}}
 									size='lg'>
 									{barang?.addedToCart == undefined || !barang?.addedToCart ? (
