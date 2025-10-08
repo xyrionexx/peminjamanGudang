@@ -8,14 +8,33 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
+import api from "@/config/axiosConfig";
 
 // ICONS
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { AxiosResponse } from "axios";
 
 // REACT
 import { signOut } from "next-auth/react";
+import notification from "./notification";
 
 export default function ProfileMenu() {
+	const handleSignOut = () => {
+		api
+			.post("/logout/")
+			.then((res: AxiosResponse) => {
+				if (res.status === 200) {
+					signOut({ callbackUrl: "/signin" });
+				} else {
+					throw new Error("Waduh gagal logout");
+				}
+			})
+			.catch((err) => {
+				console.error(err);
+				notification({ pesan: err, ok: false });
+			});
+	};
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
@@ -65,7 +84,9 @@ export default function ProfileMenu() {
 						/>
 						Pindah Akun
 					</DropdownMenuItem>
-					<DropdownMenuItem className='text-red-500' onClick={() => signOut()}>
+					<DropdownMenuItem
+						className='text-red-500'
+						onClick={() => signOut()}>
 						<Icon
 							icon='mingcute:exit-line'
 							width='24'

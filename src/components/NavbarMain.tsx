@@ -132,7 +132,7 @@ export default function MainNavbar() {
 					</Avatar>
 
 					<p className='flex shrink-0 whitespace-nowrap'>
-						{session?.user.name}
+						{session?.user.name || session?.user.email}
 					</p>
 
 					<ProfileMenu />

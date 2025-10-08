@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
 
 export default function Navbar() {
 	const router: AppRouterInstance = useRouter();
