@@ -1,102 +1,77 @@
 // SHADCN
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-	DropdownMenuGroup,
-} from "@/components/ui/dropdown-menu";
-import api from "@/config/axiosConfig";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+} from '@/components/ui/dropdown-menu';
+import api from '@/config/axiosConfig';
 
 // ICONS
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { AxiosResponse } from "axios";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { AxiosResponse } from 'axios';
 
 // REACT
-import { signOut } from "next-auth/react";
-import notification from "./notification";
+import { signOut } from 'next-auth/react';
+import notification from './notification';
 
 export default function ProfileMenu() {
-	const handleSignOut = () => {
-		api
-			.post("/logout/")
-			.then((res: AxiosResponse) => {
-				if (res.status === 200) {
-					signOut({ callbackUrl: "/signin" });
-				} else {
-					throw new Error("Waduh gagal logout");
-				}
-			})
-			.catch((err) => {
-				console.error(err);
-				notification({ pesan: err, ok: false });
-			});
-	};
+  const handleSignOut = () => {
+    api
+      .post('/logout/')
+      .then((res: AxiosResponse) => {
+        if (res.status === 200) {
+          signOut({ callbackUrl: '/signin' });
+        } else {
+          throw new Error('Waduh gagal logout');
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        notification({ pesan: err, ok: false });
+      });
+  };
 
-	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger>
-				<Icon
-					icon='ep:arrow-down'
-					width='20'
-					height='20'
-				/>
-			</DropdownMenuTrigger>
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Icon icon="ep:arrow-down" width="20" height="20" />
+      </DropdownMenuTrigger>
 
-			<DropdownMenuContent>
-				{/* HEADER / TITLE */}
-				<DropdownMenuLabel className='font-bold'>
-					Profile Menu
-				</DropdownMenuLabel>
+      <DropdownMenuContent>
+        {/* HEADER / TITLE */}
+        <DropdownMenuLabel className="font-bold">Profile Menu</DropdownMenuLabel>
 
-				<DropdownMenuSeparator />
+        <DropdownMenuSeparator />
 
-				{/* CONTENT */}
-				<DropdownMenuGroup>
-					{/* GENERAL SETTINGS */}
-					<DropdownMenuItem>
-						<Icon
-							icon='bx:user'
-							width='24'
-							height='24'
-						/>
-						Profil
-					</DropdownMenuItem>
-					<DropdownMenuItem>
-						<Icon
-							icon='gravity-ui:gear'
-							width='16'
-							height='16'
-						/>
-						Pengaturan
-					</DropdownMenuItem>
+        {/* CONTENT */}
+        <DropdownMenuGroup>
+          {/* GENERAL SETTINGS */}
+          <DropdownMenuItem>
+            <Icon icon="bx:user" width="24" height="24" />
+            Profil
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Icon icon="gravity-ui:gear" width="16" height="16" />
+            Pengaturan
+          </DropdownMenuItem>
 
-					<DropdownMenuSeparator />
+          <DropdownMenuSeparator />
 
-					{/* RISKY SETTINGS */}
-					<DropdownMenuItem>
-						<Icon
-							icon='meteor-icons:arrows-rotate'
-							width='16'
-							height='16'
-						/>
-						Pindah Akun
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						className='text-red-500'
-						onClick={() => signOut()}>
-						<Icon
-							icon='mingcute:exit-line'
-							width='24'
-							height='24'
-							className='text-red-500'
-						/>
-						Keluar
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-			</DropdownMenuContent>
-		</DropdownMenu>
-	);
+          {/* RISKY SETTINGS */}
+          <DropdownMenuItem>
+            <Icon icon="meteor-icons:arrows-rotate" width="16" height="16" />
+            Pindah Akun
+          </DropdownMenuItem>
+          <DropdownMenuItem className="text-red-500" onClick={() => signOut()}>
+            <Icon icon="mingcute:exit-line" width="24" height="24" className="text-red-500" />
+            Keluar
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }

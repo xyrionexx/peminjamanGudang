@@ -1,5 +1,3 @@
-export default function ItemDetailsPage() { 
-    return (
-        <></>
-    );
-};
+export default function ItemDetailsPage() {
+  return <></>;
+}
