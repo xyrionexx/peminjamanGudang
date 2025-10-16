@@ -28,6 +28,7 @@ import notification from '@/components/notification';
 // ==========================
 import api from '@/config/axiosConfig';
 import { AxiosResponse } from 'axios';
+import { useUsrck } from '@/hooks/usrck-hk';
 
 interface formData {
   username: string;
@@ -43,7 +44,8 @@ export default function AuthPage() {
   // ==========================
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { status } = useSession();
+  const { data: session } = useSession();
+  const { isLoading, isValidUser } = useUsrck(session?.user?.accessToken as string);
 
   // ==========================
   // 🧭 STATE UNTUK ALUR LOGIN / REGISTER
@@ -75,10 +77,11 @@ export default function AuthPage() {
 
   // Cek apakah user sudah login → kalau iya langsung redirect ke previousURL / home
   useEffect(() => {
-    if (status === 'authenticated') {
-      router.push(previousURL || '/');
-    }
-  }, [status, previousURL, router]);
+    if (isLoading) return;
+    if (!isValidUser) return;
+
+    router.push(previousURL || '/');
+  }, [previousURL, router, isValidUser, isLoading]);
 
   // Ambil callbackURL dari query params saat pertama kali komponen mount
   useEffect(() => {
@@ -219,10 +222,7 @@ export default function AuthPage() {
     });
   };
 
-  // ==========================
-  // ⏳ LOADING STATE
-  // ==========================
-  if (status === 'loading') {
+  if (isLoading) {
     return <Loading_circle />;
   }
 

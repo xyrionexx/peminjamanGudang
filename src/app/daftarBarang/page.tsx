@@ -23,6 +23,7 @@ import Footer from '@/components/footer';
 import MainNavbar from '@/components/NavbarMain';
 import { useBarang } from '@/hooks/barangHook';
 import { ErrorDisplay } from '@/components/ErrorDisplay';
+import { useUsrck } from '@/hooks/usrck-hk';
 //==========================
 
 // TYPES
@@ -32,46 +33,29 @@ type cartEventTypes = {
 };
 
 export default function DaftarBarang() {
-  // STATE //
-  // ANOTHER STATE TOOLS
+  /////////////////////////////////////////////
+  // ========== STATE INITIALIZATION ==========
+  /////////////////////////////////////////////
+
+  // Barang-related state (data barang, session, router)
   const { dataBarang, mappedDataBarang, isLoading, error } = useBarang();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+  const { isLoading: userLoading, isValidUser } = useUsrck(session?.user?.accessToken || '');
   const router: AppRouterInstance = useRouter();
 
-  // STATE FOR CATEGORY
-  let [selectedCategory, setSelectedCategory] = useState<string[]>([]);
+  // Category state
+  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [category, setCategory] = useState<{ name: string; status: boolean }[]>([
-    {
-      name: 'Audio',
-      status: false,
-    },
-    {
-      name: 'Elektronik',
-      status: false,
-    },
-    {
-      name: 'Komputer',
-      status: false,
-    },
-    {
-      name: 'Aksesoris',
-      status: false,
-    },
-    {
-      name: 'Peralatan',
-      status: false,
-    },
-    {
-      name: 'Sound',
-      status: false,
-    },
-    {
-      name: 'Fotografi',
-      status: false,
-    },
+    { name: 'Audio', status: false },
+    { name: 'Elektronik', status: false },
+    { name: 'Komputer', status: false },
+    { name: 'Aksesoris', status: false },
+    { name: 'Peralatan', status: false },
+    { name: 'Sound', status: false },
+    { name: 'Fotografi', status: false },
   ]);
 
-  // STATE FOR SEARCH RESULT
+  // Search result state
   const [searchBarang, setSearchBarang] = useState<
     | {
         kategori: string;
@@ -80,101 +64,103 @@ export default function DaftarBarang() {
     | undefined
   >();
 
-  // STATE FOR CART / KERANJANG
+  // Cart / Keranjang state
   const [barangKeranjang, setBarangKeranjang] = useState<Map<number, FoundBarang> | null>();
-  /// END OF STATES ///
 
-  // STATE HANDLERS / LIFECYCLES //
-  // AMBIL BARANG AWAL DARI KERANJANG
+  /////////////////////////////////////////////
+  // ========== EFFECTS / LIFECYCLES ==========
+  /////////////////////////////////////////////
+
+  // Ambil data keranjang awal dari local storage
   useEffect(() => {
     setBarangKeranjang(getBarangKeranjang());
   }, []);
 
-  // AMBIL HASIL PERCARIAN (NON EVENT)
+  // Ambil hasil pencarian dari URL saat pertama kali load
   useEffect(() => {
-    const params: URLSearchParams = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
+    const kategori = params.get('cat');
+    const barangParam = params.get('barang');
 
-    const kategori: string | null = params.get('cat');
-    const barangParam: string | null = params.get('barang');
-
-    if (barangParam == null || kategori == null) return;
+    if (!kategori || !barangParam) return;
 
     setSearchBarang({
-      kategori: kategori,
-      id: barangParam?.split(',').map((id: string) => Number(id)),
+      kategori,
+      id: barangParam.split(',').map((id) => Number(id)),
     });
   }, []);
 
-  // EVENT
-  // NANGKEP EVENT KETIKA HABIS MASUKAN BARANG KE KERANJANG
+  // Event listener: update keranjang ketika event 'cartUpdate' terjadi
   useEffect(() => {
-    window.addEventListener('cartUpdate', (event: Event) => {
+    const handleCartUpdate = (event: Event) => {
       const customEvent = event as CustomEvent<cartEventTypes>;
       if (customEvent.detail.key === 'cart') {
         setBarangKeranjang(
           new Map(customEvent.detail.newValue.map((barang: FoundBarang) => [barang.id, barang]))
         );
       }
-    });
+    };
+
+    window.addEventListener('cartUpdate', handleCartUpdate);
+    return () => window.removeEventListener('cartUpdate', handleCartUpdate);
   }, []);
 
-  // NANGKEP EVENT DAN MENGAMBIL HASIL SEARCH DARI URL PARAMETER
+  // Event listener: ambil hasil pencarian baru dari URL (event 'PencarianBarangDitemukan')
   useEffect(() => {
-    window.addEventListener('PencarianBarangDitemukan', () => {
-      const params: URLSearchParams = new URLSearchParams(window.location.search);
+    const handlePencarian = () => {
+      const params = new URLSearchParams(window.location.search);
+      const kategori = params.get('cat');
+      const barangParam = params.get('barang');
 
-      const kategori: string | null = params.get('cat');
-      const barangParam: string | null = params.get('barang');
-
-      if (barangParam == null || kategori == null) return;
+      if (!kategori || !barangParam) return;
 
       setSearchBarang({
-        kategori: kategori,
-        id: barangParam?.split(',').map((id: string) => Number(id)),
+        kategori,
+        id: barangParam.split(',').map((id) => Number(id)),
       });
-    });
+    };
+
+    window.addEventListener('PencarianBarangDitemukan', handlePencarian);
+    return () => window.removeEventListener('PencarianBarangDitemukan', handlePencarian);
   }, []);
 
-  // NANGKEP EVENT DAN RESET PENCARIAN DAN BARANG HASIL PENCARIAN
+  // Event listener: reset hasil pencarian (event 'resetPencarian')
   useEffect(() => {
-    window.addEventListener('resetPencarian', () => {
-      setSearchBarang(undefined);
-    });
+    const handleReset = () => setSearchBarang(undefined);
+    window.addEventListener('resetPencarian', handleReset);
+    return () => window.removeEventListener('resetPencarian', handleReset);
   }, []);
 
-  // ACCOUNT CHECKER
-  // NGECEK STATUS AKUN PENGGUNA
+  // Redirect ke /login jika status user tidak valid
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/signin?callbackUrl=/daftarBarang');
-    }
-  }, [status, router]);
+    if (isLoading) return;
+    if (isValidUser) return;
+    router.replace(`/signin?callbackUrl=${encodeURIComponent(window.location.href)}`);
+  }, [router, isValidUser, isLoading]);
 
-  // LOADING PAS LAGI NGECEK
-  if (status === 'loading') {
-    return <Loading_circle />;
-  }
-  // END OF STATE HANDLERS //
+  /////////////////////////////////////////////
+  // ============= EVENT HANDLERS =============
+  /////////////////////////////////////////////
 
-  // HANLDERS //
-  // CATEGORY
-  const handleCategory = (category: { name: string; status: boolean }) => {
-    if (selectedCategory.includes(category.name)) {
-      setSelectedCategory((prev) => prev.filter((item) => item !== category.name));
+  // Toggle kategori (aktif/nonaktif)
+  const handleCategory = (categoryItem: { name: string; status: boolean }) => {
+    if (selectedCategory.includes(categoryItem.name)) {
+      setSelectedCategory((prev) => prev.filter((item) => item !== categoryItem.name));
     } else {
-      setSelectedCategory((prev) => [...prev, category.name]);
+      setSelectedCategory((prev) => [...prev, categoryItem.name]);
     }
-    category.status = !category.status;
+    categoryItem.status = !categoryItem.status;
   };
 
-  // HANDLE CLEAR ALL CATEGORY
+  // Clear semua kategori yang dipilih
   const handleClearAll = (): void => {
     setSelectedCategory([]);
-    category.forEach((item) => {
-      item.status = false;
-    });
+    category.forEach((item) => (item.status = false));
   };
-  // END OF HANDLERS //
+
+  if (userLoading) {
+    return <Loading_circle />;
+  }
 
   return (
     <>

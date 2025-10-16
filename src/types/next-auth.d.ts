@@ -10,7 +10,29 @@ declare module 'next-auth' {
       username?: string | null;
       email?: string | null;
       image?: string | null;
-    };
+      accessToken?: string | null;
+      refreshToken?: string | null;
+    } & DefaultSession['user'];
+  }
+  interface User extends DefaultUser {
+    id: string;
+    name?: string | null;
+    username?: string | null;
+    email?: string | null;
+    accessToken?: string | null;
+    refreshToken?: string | null;
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+    name?: string | null;
+    username?: string | null;
+    email?: string | null;
+    accessToken?: string | null;
+    refreshToken?: string | null;
+    // role?: string; // Optional: Add role if you plan to use it
   }
 }
 

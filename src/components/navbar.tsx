@@ -19,10 +19,7 @@ export default function Navbar() {
         {status === 'authenticated' && user ? (
           <>
             <header
-              className="
-          flex items-center justify-between
-          rounded-lg border bg-card/50 p-4
-        "
+              className="flex items-center justify-between rounded-lg border bg-card/50 p-4"
               aria-label="User header"
             >
               {/* Kiri: Avatar + username/nickname */}

@@ -1,11 +1,10 @@
-import NextAuth, { Awaitable, DefaultSession } from 'next-auth';
+import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
 import { JWT } from 'next-auth/jwt';
 import api from '@/config/axiosConfig';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { AxiosResponse } from 'axios';
-import { Session } from 'node:inspector';
 
 export const LoginProvider = {
   provider: [
@@ -43,6 +42,8 @@ export const LoginProvider = {
             id: (user.id as string) || '',
             name: (user.username as string) || null,
             email: (user.email as string) || null,
+            accessToken: (user.access as string) || null,
+            refreshToken: (user.refresh as string) || null,
           };
         } catch (error) {
           console.error(error);
@@ -57,15 +58,29 @@ const handler = NextAuth({
   providers: LoginProvider.provider,
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: 'database',
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
+    async jwt({ token, user }): Promise<JWT> {
+      if (user) {
+        token.id = user.id ?? token.sub ?? '';
+        token.name = user.name ?? '';
+        token.email = user.email ?? '';
+        token.accessToken = (user as any).accessToken ?? '';
+        token.refreshToken = (user as any).refreshToken ?? '';
+      }
+      return token;
+    },
     async session({ session, token }) {
       session.user = {
         id: token.id as string, // Ensure id is a string
         name: token.name || null,
         email: token.email || null,
-        image: token.picture || null,
+        image: session.user?.image || null,
+        accessToken: token.accessToken as string,
+        refreshToken: token.refreshToken as string,
       };
       return session;
     },
