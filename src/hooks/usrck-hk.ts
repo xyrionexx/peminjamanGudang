@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
+import axios, { AxiosResponse } from 'axios';
 import api from '@/config/axiosConfig';
+import { useSession } from 'next-auth/react';
 
 export const useUsrck = (token: string) => {
+  const { data: session, update } = useSession();
   const [isLoading, setIsLoading] = useState<boolean>(!!token);
   const [isValidUser, setIsValidUser] = useState<boolean>(false);
+  const [statusError, setStatusError] = useState<number | null>(null);
+  const [tokens, setTokens] = useState<{ access: string; refresh: string } | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -15,7 +20,7 @@ export const useUsrck = (token: string) => {
       }
       setIsLoading(true);
       try {
-        const res = await api.get('/user/', {
+        const res: AxiosResponse<any, any, {}> = await api.get('/user/', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -25,7 +30,9 @@ export const useUsrck = (token: string) => {
         }
       } catch (error) {
         if (isMounted) {
+          if (!axios.isAxiosError(error)) return;
           setIsValidUser(false);
+          setStatusError(error.response?.status || null);
         }
       } finally {
         if (isMounted) {
@@ -39,6 +46,32 @@ export const useUsrck = (token: string) => {
       isMounted = false;
     };
   }, [token]);
+
+  useEffect(() => {
+    const refreshTokens = async () => {
+      if (statusError !== 401) return;
+
+      try {
+        const res = await api.post('/token/refresh/', {
+          refresh: session?.user.refreshToken,
+        });
+
+        if (res.status === 200 && 'access' in res.data && 'refresh' in res.data) {
+          setTokens(res.data);
+        }
+      } catch {
+        setTokens(null);
+      }
+    };
+
+    refreshTokens();
+  }, [statusError]);
+
+  useEffect(() => {
+    if (tokens) {
+      update({ user: { accessToken: tokens.access, refreshToken: tokens.refresh } });
+    }
+  }, [tokens]);
 
   return { isLoading, isValidUser };
 };
