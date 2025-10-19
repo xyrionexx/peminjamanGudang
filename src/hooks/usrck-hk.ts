@@ -69,7 +69,7 @@ export const useUsrck = (token: string) => {
 
   useEffect(() => {
     if (tokens) {
-      update({ user: { accessToken: tokens.access, refreshToken: tokens.refresh } });
+      update({ accessToken: tokens.access, refreshToken: tokens.refresh });
     }
   }, [tokens]);
 

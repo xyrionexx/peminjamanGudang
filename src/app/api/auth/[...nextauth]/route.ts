@@ -63,7 +63,12 @@ const handler = NextAuth({
     updateAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
-    async jwt({ token, user }): Promise<JWT> {
+    async jwt({ token, trigger, user, session }): Promise<JWT> {
+      if (trigger === 'update' && session?.accessToken) {
+        token.accessToken = session.accessToken;
+        token.refreshToken = session.refreshToken;
+      }
+
       if (user) {
         token.id = user.id ?? token.sub ?? '';
         token.name = user.name ?? '';
@@ -71,6 +76,7 @@ const handler = NextAuth({
         token.accessToken = (user as any).accessToken ?? '';
         token.refreshToken = (user as any).refreshToken ?? '';
       }
+
       return token;
     },
     async session({ session, token }) {
