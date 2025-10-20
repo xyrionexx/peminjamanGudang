@@ -18,6 +18,7 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 // COMPONENTS
 import ProfileMenu from './ProfileMenu';
 import CartSidebarBtn from './CartSidebarBtn';
+import { UserIdentity } from './UserProfile';
 // FUNCTIONS
 import { EnhancedSearch } from './search';
 import { B_Search } from '@/scripts/Binary-Search';
@@ -111,18 +112,20 @@ export default function MainNavbar() {
         </div>
 
         {/* AVATAR */}
-        <div className="flex gap-3 justify-center items-center">
-          <Avatar>
-            <AvatarImage src={session?.user.image ?? 'https://avatar.iran.liara.run/public'} />
-            <AvatarFallback>ID</AvatarFallback>
-          </Avatar>
-
-          <p className="flex shrink-0 whitespace-nowrap">
-            {session?.user.name || session?.user.email}
-          </p>
-
+        <header
+          className="flex items-center justify-between rounded-lg border bg-card/50 p-4 gap-x-4 shadow-md"
+          aria-label="User header"
+        >
+          {/* Kiri: Avatar + username/nickname */}
+          <UserIdentity
+            username={session?.user.name || 'User'}
+            nickname={session?.user.email || 'NoEmail'}
+            imageUrl={session?.user.image ?? 'https://avatar.iran.liara.run/public'}
+            size="sm"
+          />
+          {/* Kanan: ProfileMenu */}
           <ProfileMenu />
-        </div>
+        </header>
       </div>
     </div>
   );

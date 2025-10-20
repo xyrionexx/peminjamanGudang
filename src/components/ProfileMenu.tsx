@@ -19,22 +19,6 @@ import { signOut } from 'next-auth/react';
 import notification from './notification';
 
 export default function ProfileMenu() {
-  const handleSignOut = () => {
-    api
-      .post('/logout/')
-      .then((res: AxiosResponse) => {
-        if (res.status === 200) {
-          signOut({ callbackUrl: '/signin' });
-        } else {
-          throw new Error('Waduh gagal logout');
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        notification({ pesan: err, ok: false });
-      });
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>

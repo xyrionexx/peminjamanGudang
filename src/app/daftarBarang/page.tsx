@@ -85,7 +85,7 @@ export default function DaftarBarang() {
    * useSession: Hook NextAuth untuk get session data
    * Returns session object yang berisi user info dan tokens
    */
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   /**
    * useUsrck: Custom hook untuk validasi user dan auto token refresh
@@ -308,18 +308,14 @@ export default function DaftarBarang() {
    * - Skip jika isValidUser true (user valid)
    */
   useEffect(() => {
-    // Guard: tunggu session load
-    if (session === undefined) return;
-
-    // Guard: tunggu validasi user selesai
-    if (userLoading) return;
-
-    // Guard: jika user valid, tidak perlu redirect
-    if (isValidUser) return;
-
     // User tidak valid, redirect ke login dengan callback URL
-    router.replace(`/signin?callbackUrl=${encodeURIComponent(window.location.href)}`);
-  }, [session, isValidUser, userLoading, router]);
+    if (status === 'unauthenticated' && session == undefined) {
+      router.replace(`/signin?callbackUrl=${encodeURIComponent(window.location.href)}`);
+    }
+    if (!userLoading && session && !isValidUser) {
+      router.replace(`/signin?callbackUrl=${encodeURIComponent(window.location.href)}`);
+    }
+  }, [session, isValidUser, userLoading, router, status]);
 
   // ==========================================================================
   // EVENT HANDLERS - CATEGORY FILTER

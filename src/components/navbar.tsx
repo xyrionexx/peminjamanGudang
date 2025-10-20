@@ -8,7 +8,7 @@ import { UserIdentity } from './UserProfile';
 
 export default function Navbar() {
   const router: AppRouterInstance = useRouter();
-  const { data: user, status } = useSession();
+  const { data: session, status } = useSession();
 
   return (
     <header className="w-full bg-[#faf9ee] px-6 py-5 shadow-sm border-b border-[#eeeeee]/30 top-0 z-50 fixed">
@@ -16,19 +16,18 @@ export default function Navbar() {
         {/* Logo */}
         <div className="text-3xl font-bold text-[#d2c2af] tracking-tight">G-Ware</div>
 
-        {status === 'authenticated' && user ? (
+        {status === 'authenticated' && session ? (
           <>
             <header
-              className="flex items-center justify-between rounded-lg border bg-card/50 p-4"
+              className="flex items-center justify-between rounded-lg border bg-card/50 p-4 gap-x-4 shadow-md"
               aria-label="User header"
             >
               {/* Kiri: Avatar + username/nickname */}
               <UserIdentity
-                username="johndoe"
-                nickname="John D."
-                imageUrl="/avatar-placeholder.png"
-                size="md"
-                className="max-w-[60%]"
+                username={session?.user.name || 'User'}
+                nickname={session?.user.email || 'NoEmail'}
+                imageUrl={session?.user.image ?? 'https://avatar.iran.liara.run/public'}
+                size="sm"
               />
               {/* Kanan: ProfileMenu */}
               <ProfileMenu />
