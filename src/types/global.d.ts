@@ -14,4 +14,13 @@ export interface BarangTransaksiType {
   kategori: string;
 }
 
+export interface StatusConfig {
+  label: string;
+  icon: typeof Loader;
+  bgColor: string;
+  borderColor: string;
+  titleColor: string;
+  descColor: string;
+}
+
 export type FoundBarang = DataBarangType & { index?: number; addedToCart?: boolean };

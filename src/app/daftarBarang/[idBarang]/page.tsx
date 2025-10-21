@@ -31,7 +31,7 @@ import Footer from '@/components/footer';
 import MainNavbar from '@/components/NavbarMain';
 import { FoundBarang } from '@/types/global';
 import { handle_AddToCart, handle_RemoveFromCart } from '@/scripts/cartHandler';
-import { preconnect } from 'react-dom';
+import { useRouter } from 'next/navigation';
 
 export default function ProductDetailPage() {
   // STATE
@@ -40,6 +40,9 @@ export default function ProductDetailPage() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [barang, setBarang] = useState<FoundBarang>();
   const [urlPathname, setURLPathname] = useState<string[]>();
+  const [isCheckOutClicked, setIsCheckOutClicked] = useState<boolean>(false);
+
+  const router = useRouter();
 
   // STATIC DATA / NON STATE
   let breadCrumbPath: string = '';
@@ -162,12 +165,25 @@ export default function ProductDetailPage() {
                 {/* ORDER SEKARANG */}
                 <Button
                   variant={'default'}
-                  className="flex-1 bg-green-500 hover:bg-green-600 h-10 text-sm"
-                  onClick={() => {}}
-                  onMouseEnter={() => {}}
+                  className="flex-1 bg-green-500 hover:bg-green-600 h-10 text-sm flex items-center justify-center"
+                  onClick={() => {
+                    if (isCheckOutClicked) return;
+                    setIsCheckOutClicked(true);
+                    // beri waktu supaya spinner terlihat sebelum navigasi
+                    setTimeout(() => router.push('/txnPage'), 600);
+                  }}
+                  disabled={isCheckOutClicked}
                 >
-                  <Icon icon="material-symbols:shopping-bag-outline" width="24" height="24" />
-                  Pesan sekarang
+                  {isCheckOutClicked ? (
+                    <>
+                      <Icon icon="line-md:loading-loop" width="24" height="24" />
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="material-symbols:shopping-bag-outline" width="24" height="24" />
+                      <span className="ml-2">Pesan sekarang</span>
+                    </>
+                  )}
                 </Button>
 
                 {/* MASUKKAN KE KERANJANG */}

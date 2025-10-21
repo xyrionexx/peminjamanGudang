@@ -367,7 +367,7 @@ export default function DaftarBarang() {
       <MainNavbar />
 
       {/* ===== MAIN CONTENT CONTAINER ===== */}
-      <div className="flex flex-col py-20">
+      <div className="flex flex-col py-20 mt-8">
         {/* ===== SECTION: DAFTAR BARANG ===== */}
         <div className="flex flex-wrap shrink-0 gap-10 justify-center">
           {/* Grid Layout untuk Cards */}

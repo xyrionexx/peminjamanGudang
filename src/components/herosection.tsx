@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { Link as ScrollLink } from 'react-scroll';
 import { Button } from './ui/button';
+import { useState } from 'react';
+import { Icon } from '@iconify/react';
 
 export default function HeroSection() {
+  const [isClicked, setIsClicked] = useState<boolean>(false);
   return (
     <section className="relative min-h-screen flex items-center justify-between max-w-7xl mx-auto">
       {/* Content */}
@@ -19,7 +22,11 @@ export default function HeroSection() {
 
         <div className="flex gap-5 items-center">
           <Link href="/daftarBarang">
-            <button className="bg-[#a2af9b] hover:bg-[#8a9682] text-[#ffffff] font-semibold text-lg px-8 py-4 rounded-full transition-colors duration-200 shadow-2xl shadow-[#a2af9b]">
+            <button
+              onClick={() => setIsClicked((prev) => !prev)}
+              className="bg-[#a2af9b] hover:bg-[#8a9682] text-[#ffffff] font-semibold text-lg px-8 py-4 rounded-full transition-colors duration-200 shadow-2xl shadow-[#a2af9b] flex-row gap-2 items-center flex"
+            >
+              {isClicked && <Icon icon="line-md:loading-loop" width="24" height="24" />}
               Pinjam Sekarang
             </button>
           </Link>

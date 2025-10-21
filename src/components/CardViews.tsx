@@ -11,7 +11,7 @@ import { Button } from './ui/button';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { JSX } from 'react';
+import { JSX, useState } from 'react';
 import { useRouter } from 'next/navigation';
 //==========================
 
@@ -40,6 +40,7 @@ type CardViewsProps = {
 export default function CardViews({ item, itemFromCart }: CardViewsProps): JSX.Element {
   // STATES
   const router = useRouter();
+  const [isOrderNowClicked, setIsOrderNowClicked] = useState<boolean>(false);
 
   // CHECK WHETHER THE BOTH OF DATA IS EXIST OR NOT
   if (!item) {
@@ -138,15 +139,29 @@ export default function CardViews({ item, itemFromCart }: CardViewsProps): JSX.E
 
       <CardFooter className="flex-col gap-3 p-4 pt-0 flex-shrink-0">
         {/* TOMBOL PESAN SEKARANG */}
-        <Button
-          variant={'default'}
-          className="w-full bg-green-500 hover:bg-green-600 h-10 text-sm"
-          onClick={() => router.push(`daftarBarang/${removeWhitespaceAndLowercase(item.nama)}`)}
-          onMouseEnter={() => getCurrentBarang()}
-        >
-          <Icon icon="material-symbols:shopping-bag-outline" width="24" height="24" />
-          Pesan sekarang
-        </Button>
+        {isOrderNowClicked ? (
+          <Button
+            variant="default"
+            className="w-full bg-green-500 hover:bg-green-600 h-10 text-sm opacity-80 cursor-not-allowed"
+            disabled
+          >
+            <Icon icon="mdi:loading" width="20" height="20" className="animate-spin" />
+            Memproses...
+          </Button>
+        ) : (
+          <Button
+            variant={'default'}
+            className="w-full bg-green-500 hover:bg-green-600 h-10 text-sm"
+            onClick={() => {
+              setIsOrderNowClicked(true);
+              router.push(`daftarBarang/${removeWhitespaceAndLowercase(item.nama)}`);
+            }}
+            onMouseEnter={() => getCurrentBarang()}
+          >
+            <Icon icon="material-symbols:shopping-bag-outline" width="24" height="24" />
+            Pesan sekarang
+          </Button>
+        )}
 
         {/* TOMBOL MASUKKAN KE KERANJANG / BUANG DARI KERANJANG */}
         <Button
