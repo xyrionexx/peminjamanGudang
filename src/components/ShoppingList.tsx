@@ -1,15 +1,8 @@
 import { Trash2, Package } from "lucide-react";
-
-interface ItemBelanjaan {
-  id: number;
-  name: string;
-  quantity: number;
-  image: string;
-  kategori: string;
-}
+import { ItemBelanjaan } from "@/types/global";
 
 interface ShoppingListSectionProps {
-  daftarBelanjaan: ItemBelanjaan[];
+  daftarBelanjaan?: ItemBelanjaan[];
   onDeleteItem: (id: number) => void;
 }
 
@@ -27,14 +20,14 @@ export const ShoppingItemCard = ({ item, onDelete }: ShoppingItemCardProps) => {
     <div className="flex gap-4 p-4 border border-gray-200 rounded-lg hover:border-emerald-300 transition-colors">
       {/* Product Image */}
       <img
-        src={item.image || '/placeholder.svg'}
-        alt={item.name}
+        src={item.gambar || 'https://picsum.photos/200'}
+        alt={item.nama}
         className="w-24 h-24 object-cover rounded-lg border border-gray-200"
       />
 
       {/* Product Info */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-gray-900 mb-1">{item.name}</h3>
+        <h3 className="font-semibold text-gray-900 mb-1">{item.nama}</h3>
         <p className="text-sm text-gray-500 mb-2">Kategori: {item.kategori}</p>
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-600">
@@ -56,7 +49,11 @@ export const ShoppingItemCard = ({ item, onDelete }: ShoppingItemCardProps) => {
 };
 
 export const ShoppingListSection = ({ daftarBelanjaan, onDeleteItem }: ShoppingListSectionProps) => {
-  const totalJumlahBarang = calculateTotalQuantity(daftarBelanjaan);
+  let totalJumlahBarang: number = 0;
+
+  if (daftarBelanjaan) {
+    totalJumlahBarang = calculateTotalQuantity(daftarBelanjaan);
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
@@ -68,9 +65,16 @@ export const ShoppingListSection = ({ daftarBelanjaan, onDeleteItem }: ShoppingL
 
       {/* Items List */}
       <div className="space-y-4">
-        {daftarBelanjaan.map((item) => (
-          <ShoppingItemCard key={item.id} item={item} onDelete={onDeleteItem} />
-        ))}
+        {!daftarBelanjaan || daftarBelanjaan.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <p className="text-lg font-medium">Barang transaksi kosong</p>
+            <p className="text-sm">Tambahkan barang untuk memulai transaksi.</p>
+          </div>
+        ) : (
+          daftarBelanjaan.map((item) => (
+            <ShoppingItemCard key={item.id} item={item} onDelete={onDeleteItem} />
+          ))
+        )}
       </div>
 
       {/* Total Summary */}

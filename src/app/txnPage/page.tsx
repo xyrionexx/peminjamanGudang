@@ -1,18 +1,16 @@
 'use client';
 
 import { StatusConfig } from '@/types/global';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  CheckCircle,
-  Clock,
-  Loader,
-} from 'lucide-react';;
+import { useEffect, useState } from 'react';
+import { ItemBelanjaan } from '@/types/global';
+import { CheckCircle, Clock, Loader } from 'lucide-react';
 import MainNavbar from '@/components/NavbarMain';
 import { ShoppingListSection } from '@/components/ShoppingList';
 import { StatusAlert } from '@/components/StatusAlert';
 import { BarcodeSection } from '@/components/BarcodeSection';
 import { InfoBox } from '@/components/InfoBox';
+import { queryClient } from '@/config/queryClient';
+import { useIsRestoring } from '@tanstack/react-query';
 
 // ========================================
 // TYPE DEFINITIONS
@@ -24,14 +22,6 @@ type StatusTransaksi =
   | 'sedang-meminjam'
   | 'peminjaman-selesai';
 
-interface ItemBelanjaan {
-  id: number;
-  name: string;
-  quantity: number;
-  image: string;
-  kategori: string;
-}
-
 // ========================================
 // MAIN COMPONENT: TRANSACTION PAGE
 // ========================================
@@ -40,30 +30,6 @@ export default function TransactionPage() {
   // ========================================
   // CONSTANTS
   // ========================================
-
-  const MOCK_BELANJAAN: ItemBelanjaan[] = [
-    {
-      id: 1,
-      name: 'Sony WH-1000XM5 Wireless Headphones',
-      quantity: 1,
-      image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=100',
-      kategori: 'Audio',
-    },
-    {
-      id: 2,
-      name: 'Canon EOS R6 Mark II Camera Body',
-      quantity: 1,
-      image: 'https://images.unsplash.com/photo-1606980227037-f2cb59211d61?w=100',
-      kategori: 'Fotografi',
-    },
-    {
-      id: 3,
-      name: 'Logitech MX Master 3S Mouse',
-      quantity: 2,
-      image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=100',
-      kategori: 'Komputer',
-    },
-  ];
 
   const STATUS_CONFIGS: Record<StatusTransaksi, StatusConfig> = {
     'sedang-transaksi': {
@@ -106,7 +72,16 @@ export default function TransactionPage() {
 
   const [apakahBarcodeSudahDibuat, setApakahBarcodeSudahDibuat] = useState<boolean>(false);
   const [statusTransaksi, setStatusTransaksi] = useState<StatusTransaksi>('sedang-transaksi');
-  const [daftarBelanjaan, setDaftarBelanjaan] = useState<ItemBelanjaan[]>(MOCK_BELANJAAN);
+  const [daftarBelanjaan, setDaftarBelanjaan] = useState<ItemBelanjaan[] | undefined>(undefined);
+  const isRestoring = useIsRestoring();
+
+  useEffect(() => {
+    if (isRestoring) return;
+    const data = queryClient.getQueryData(['checkoutItem']);
+    setDaftarBelanjaan(
+      data == null ? [] : Array.isArray(data) ? data : [data]
+    );
+  }, [isRestoring]);
 
   // ========================================
   // EVENT HANDLERS
@@ -125,7 +100,8 @@ export default function TransactionPage() {
    * Handler untuk menghapus item dari daftar belanjaan
    */
   const handleHapusBarang = (itemId: number) => {
-    setDaftarBelanjaan((prev) => prev.filter((item) => item.id !== itemId));
+    queryClient.removeQueries({queryKey: ['checkoutItem'], exact: true});
+    setDaftarBelanjaan((prev) => prev?.filter((item) => item.id !== itemId));
   };
 
   // ========================================

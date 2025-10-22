@@ -23,4 +23,13 @@ export interface StatusConfig {
   descColor: string;
 }
 
+export interface ItemBelanjaan {
+  id: number;
+  nama: string;
+  desc: string;
+  quantity: number;
+  gambar: string;
+  kategori: string;
+}
+
 export type FoundBarang = DataBarangType & { index?: number; addedToCart?: boolean };

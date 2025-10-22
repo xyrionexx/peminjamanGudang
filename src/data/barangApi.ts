@@ -10,13 +10,3 @@ export async function getAllBarang() {
     throw error;
   }
 }
-
-export async function getUserSession() {
-  try {
-    const response: AxiosResponse = await api.get('/user');
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}

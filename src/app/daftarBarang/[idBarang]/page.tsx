@@ -32,6 +32,7 @@ import MainNavbar from '@/components/NavbarMain';
 import { FoundBarang } from '@/types/global';
 import { handle_AddToCart, handle_RemoveFromCart } from '@/scripts/cartHandler';
 import { useRouter } from 'next/navigation';
+import { queryClient } from '@/config/queryClient';
 
 export default function ProductDetailPage() {
   // STATE
@@ -59,6 +60,19 @@ export default function ProductDetailPage() {
   // HANDLERS
   const handleCartActions = () => {
     barang?.addedToCart ? handle_RemoveFromCart(barang.nama) : handle_AddToCart(barang!);
+  };
+
+  const handleCheckOut = () => {
+    if (isCheckOutClicked) return;
+    setIsCheckOutClicked(true);
+
+    queryClient.setQueryData(['checkoutItem'], {
+      ...barang,
+      quantity: quantity,
+    });
+
+    // beri waktu supaya spinner terlihat sebelum navigasi
+    setTimeout(() => router.push('/txnPage'), 600);
   };
 
   return (
@@ -166,12 +180,7 @@ export default function ProductDetailPage() {
                 <Button
                   variant={'default'}
                   className="flex-1 bg-green-500 hover:bg-green-600 h-10 text-sm flex items-center justify-center"
-                  onClick={() => {
-                    if (isCheckOutClicked) return;
-                    setIsCheckOutClicked(true);
-                    // beri waktu supaya spinner terlihat sebelum navigasi
-                    setTimeout(() => router.push('/txnPage'), 600);
-                  }}
+                  onClick={() => {handleCheckOut();}}
                   disabled={isCheckOutClicked}
                 >
                   {isCheckOutClicked ? (

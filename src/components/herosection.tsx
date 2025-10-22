@@ -3,6 +3,8 @@ import { Link as ScrollLink } from 'react-scroll';
 import { Button } from './ui/button';
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
+import Image from 'next/image';
+import gambar from '../../public/1561.jpg';
 
 export default function HeroSection() {
   const [isClicked, setIsClicked] = useState<boolean>(false);
@@ -39,11 +41,16 @@ export default function HeroSection() {
       </div>
 
       <div className="relative z-10 px-4 max-w-4xl">
-        <img
-          src="https://picsum.photos/id/1015/640/480"
-          alt=""
-          className="w-full h-full object-cover rounded-lg shadow-lg"
-        />
+        <div className="relative w-full h-80 rounded-lg overflow-hidden shadow-lg">
+          <Image
+            src={gambar ?? 'https://picsum.photos/id/1015/640/480'}
+            alt="Warehouse"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
+          />
+        </div>
       </div>
     </section>
   );
