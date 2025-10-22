@@ -1,23 +1,38 @@
-import { QrCode } from "lucide-react";
+import { QrCode } from 'lucide-react';
 
 const generateTransactionCode = (): string => {
   return `TRX-2025-${Math.floor(Math.random() * 10000)}`;
 };
 
+interface QrViewerProps {
+  base64: string;
+}
+
+function QrViewer({ base64 }: QrViewerProps) {
+  return (
+    <img
+      src={`data:image/png;base64,${base64}`}
+      alt="QR Code"
+      style={{ width: 200, height: 200 }}
+    />
+  );
+}
+
+
 interface BarcodeDisplayProps {
+  data?: string;
   isGenerated: boolean;
 }
 
-export const BarcodeDisplay = ({ isGenerated }: BarcodeDisplayProps) => {
+export const BarcodeDisplay = ({ isGenerated, data }: BarcodeDisplayProps) => {
   if (isGenerated) {
     return (
       <div className="flex flex-col items-center">
         {/* Placeholder for actual barcode component */}
         <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-          <QrCode className="w-32 h-32 text-gray-400" />
+          <QrViewer base64={data || ''} />
         </div>
         <p className="text-sm text-gray-600 text-center">Scan barcode ini di gudang</p>
-        <p className="text-xs text-gray-500 mt-2">Kode: {generateTransactionCode()}</p>
       </div>
     );
   }
@@ -34,11 +49,16 @@ export const BarcodeDisplay = ({ isGenerated }: BarcodeDisplayProps) => {
 };
 
 interface BarcodeSectionProps {
+  barcodeData?: string;
   isBarcodeGenerated: boolean;
   onRequestBarcode: () => void;
 }
 
-export const BarcodeSection = ({ isBarcodeGenerated, onRequestBarcode }: BarcodeSectionProps) => {
+export const BarcodeSection = ({
+  isBarcodeGenerated,
+  onRequestBarcode,
+  barcodeData,
+}: BarcodeSectionProps) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       {/* Section Header */}
@@ -49,7 +69,10 @@ export const BarcodeSection = ({ isBarcodeGenerated, onRequestBarcode }: Barcode
 
       {/* Barcode Container */}
       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 mb-4">
-        <BarcodeDisplay isGenerated={isBarcodeGenerated} />
+        <BarcodeDisplay
+          isGenerated={isBarcodeGenerated}
+          data={barcodeData}
+        />
       </div>
 
       {/* Request Barcode Button */}

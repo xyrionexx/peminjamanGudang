@@ -11,6 +11,11 @@ import { BarcodeSection } from '@/components/BarcodeSection';
 import { InfoBox } from '@/components/InfoBox';
 import { queryClient } from '@/config/queryClient';
 import { useIsRestoring } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
+import { useUsrck } from '@/hooks/usrck-hk';
+import { useRouter } from 'next/navigation';
+import api from '@/config/axiosConfig';
+import notification from '@/components/notification';
 
 // ========================================
 // TYPE DEFINITIONS
@@ -67,21 +72,81 @@ export default function TransactionPage() {
   };
 
   // ========================================
+  // AUTHENTICATION & USER VALIDATION
+  // ========================================
+
+  /**
+   * useSession: Hook NextAuth untuk get session data
+   * Returns session object yang berisi user info dan tokens
+   */
+  const { data: session, status } = useSession();
+
+  /**
+   * useUsrck: Custom hook untuk validasi user dan auto token refresh
+   * Returns:
+   * - userLoading: Loading state saat validasi user
+   * - isValidUser: Boolean apakah user valid/terautentikasi
+   */
+  const { isLoading: userLoading, isValidUser } = useUsrck(session?.user?.accessToken || '');
+
+  // ========================================
   // STATE MANAGEMENT
   // ========================================
 
   const [apakahBarcodeSudahDibuat, setApakahBarcodeSudahDibuat] = useState<boolean>(false);
   const [statusTransaksi, setStatusTransaksi] = useState<StatusTransaksi>('sedang-transaksi');
   const [daftarBelanjaan, setDaftarBelanjaan] = useState<ItemBelanjaan[] | undefined>(undefined);
+  const [storeBarcode, setStoreBarcode] = useState<string>('');
   const isRestoring = useIsRestoring();
 
+  const router = useRouter();
+
+  // ========================================
+  // EFFECTS 1: SYNC SHOPPING LIST FROM REACT QUERY CACHE
+  // ========================================
+
+  /**
+   * Sinkronisasi state daftar belanjaan dengan data dari React Query cache
+   * - Mengambil data dari cache key 'checkoutItem'
+   * - Normalize data jadi array (handle null/single object)
+   * - Skip saat proses restore sedang berjalan
+   */
   useEffect(() => {
+    // Skip sync saat restore untuk hindari race condition
     if (isRestoring) return;
+
     const data = queryClient.getQueryData(['checkoutItem']);
-    setDaftarBelanjaan(
-      data == null ? [] : Array.isArray(data) ? data : [data]
-    );
+
+    // Normalize: null → [], single object → [object], array → array
+    setDaftarBelanjaan(data == null ? [] : Array.isArray(data) ? data : [data]);
   }, [isRestoring]);
+
+  // ==========================================================================
+  // EFFECT 2: AUTHENTICATION GUARD (PROTECTED ROUTE)
+  // ==========================================================================
+
+  /**
+   * Effect: Redirect ke halaman login jika user tidak valid
+   *
+   * Flow:
+   * 1. Tunggu session dan user validation selesai
+   * 2. Jika user tidak valid, redirect ke /signin
+   * 3. Simpan current URL di callbackUrl untuk redirect balik setelah login
+   *
+   * Guards:
+   * - Skip jika session masih undefined (belum loaded)
+   * - Skip jika userLoading masih true (masih validasi)
+   * - Skip jika isValidUser true (user valid)
+   */
+  useEffect(() => {
+    // User tidak valid, redirect ke login dengan callback URL
+    if (status === 'unauthenticated' && session == undefined) {
+      router.replace(`/signin?callbackUrl=${encodeURIComponent(window.location.href)}`);
+    }
+    if (!userLoading && session && !isValidUser) {
+      router.replace(`/signin?callbackUrl=${encodeURIComponent(window.location.href)}`);
+    }
+  }, [session, isValidUser, userLoading, router, status]);
 
   // ========================================
   // EVENT HANDLERS
@@ -90,17 +155,46 @@ export default function TransactionPage() {
   /**
    * Handler untuk request barcode dari server
    */
-  const handleMintaBarcode = () => {
-    console.log('Request barcode ke server');
-    // TODO: Implement API call to generate barcode
-    setApakahBarcodeSudahDibuat(true);
+  const handleMintaBarcode = async () => {
+    try {
+      const res = await api.post(
+        '/qrtxncode/',
+        {
+          nama_barang: daftarBelanjaan?.[0].nama,
+          jumlah: daftarBelanjaan?.[0].quantity,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${session?.user?.accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        setApakahBarcodeSudahDibuat(true);
+        setStoreBarcode(res.data.qr_code);
+      }
+    } catch (error) {
+      console.error(error);
+
+      notification({
+        pesan: 'Gagal membuat barcode',
+        deskripsi:
+          (error as any)?.response?.data?.message ||
+          (error as any)?.response?.data?.detail ||
+          (error as any)?.message ||
+          'Terjadi kesalahan saat meminta barcode. Silakan coba lagi.',
+        ok: false,
+      });
+    }
   };
 
   /**
    * Handler untuk menghapus item dari daftar belanjaan
    */
   const handleHapusBarang = (itemId: number) => {
-    queryClient.removeQueries({queryKey: ['checkoutItem'], exact: true});
+    queryClient.removeQueries({ queryKey: ['checkoutItem'], exact: true });
     setDaftarBelanjaan((prev) => prev?.filter((item) => item.id !== itemId));
   };
 
@@ -139,6 +233,7 @@ export default function TransactionPage() {
             <BarcodeSection
               isBarcodeGenerated={apakahBarcodeSudahDibuat}
               onRequestBarcode={handleMintaBarcode}
+              barcodeData={storeBarcode}
             />
 
             {/* Information Box */}
