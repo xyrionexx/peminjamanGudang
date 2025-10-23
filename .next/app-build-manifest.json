@@ -26,6 +26,13 @@
       "static/chunks/main-app-abdf60f5a2019f26.js",
       "static/chunks/app/api/auth/[...nextauth]/route-13102854f433a355.js"
     ],
+    "/itemDetails/page": [
+      "static/chunks/webpack-879758e535f6a972.js",
+      "static/chunks/4bd1b696-cf72ae8a39fa05aa.js",
+      "static/chunks/964-02efbd2195ef91bd.js",
+      "static/chunks/main-app-abdf60f5a2019f26.js",
+      "static/chunks/app/itemDetails/page-13102854f433a355.js"
+    ],
     "/home/page": [
       "static/chunks/webpack-879758e535f6a972.js",
       "static/chunks/4bd1b696-cf72ae8a39fa05aa.js",
@@ -57,6 +64,30 @@
       "static/chunks/143-05ec5ee9534fd022.js",
       "static/chunks/app/daftarBarang/[idBarang]/page-a0b67f82744d97e4.js"
     ],
+    "/page": [
+      "static/chunks/webpack-879758e535f6a972.js",
+      "static/chunks/4bd1b696-cf72ae8a39fa05aa.js",
+      "static/chunks/964-02efbd2195ef91bd.js",
+      "static/chunks/main-app-abdf60f5a2019f26.js",
+      "static/chunks/108-3af23e4925e4ed56.js",
+      "static/chunks/111-22df458bd6b51fd3.js",
+      "static/chunks/947-2a2d56342e8557ea.js",
+      "static/chunks/766-41587ae232ab9347.js",
+      "static/chunks/817-b6ec78ba3ff0a7d6.js",
+      "static/chunks/610-e864798540a7f102.js",
+      "static/chunks/app/page-cdf568f3525fa860.js"
+    ],
+    "/signin/page": [
+      "static/chunks/webpack-879758e535f6a972.js",
+      "static/chunks/4bd1b696-cf72ae8a39fa05aa.js",
+      "static/chunks/964-02efbd2195ef91bd.js",
+      "static/chunks/main-app-abdf60f5a2019f26.js",
+      "static/chunks/108-3af23e4925e4ed56.js",
+      "static/chunks/111-22df458bd6b51fd3.js",
+      "static/chunks/671-e8faf750d8f57bf4.js",
+      "static/chunks/464-7d3d2f37f46dc965.js",
+      "static/chunks/app/signin/page-c8c52b8478ce8910.js"
+    ],
     "/txnPage/page": [
       "static/chunks/webpack-879758e535f6a972.js",
       "static/chunks/4bd1b696-cf72ae8a39fa05aa.js",
@@ -72,37 +103,6 @@
       "static/chunks/432-799654d5c9c76f74.js",
       "static/chunks/143-05ec5ee9534fd022.js",
       "static/chunks/app/txnPage/page-dffb256d528d7ce0.js"
-    ],
-    "/signin/page": [
-      "static/chunks/webpack-879758e535f6a972.js",
-      "static/chunks/4bd1b696-cf72ae8a39fa05aa.js",
-      "static/chunks/964-02efbd2195ef91bd.js",
-      "static/chunks/main-app-abdf60f5a2019f26.js",
-      "static/chunks/108-3af23e4925e4ed56.js",
-      "static/chunks/111-22df458bd6b51fd3.js",
-      "static/chunks/671-e8faf750d8f57bf4.js",
-      "static/chunks/464-7d3d2f37f46dc965.js",
-      "static/chunks/app/signin/page-c8c52b8478ce8910.js"
-    ],
-    "/page": [
-      "static/chunks/webpack-879758e535f6a972.js",
-      "static/chunks/4bd1b696-cf72ae8a39fa05aa.js",
-      "static/chunks/964-02efbd2195ef91bd.js",
-      "static/chunks/main-app-abdf60f5a2019f26.js",
-      "static/chunks/108-3af23e4925e4ed56.js",
-      "static/chunks/111-22df458bd6b51fd3.js",
-      "static/chunks/947-2a2d56342e8557ea.js",
-      "static/chunks/766-41587ae232ab9347.js",
-      "static/chunks/817-b6ec78ba3ff0a7d6.js",
-      "static/chunks/610-e864798540a7f102.js",
-      "static/chunks/app/page-cdf568f3525fa860.js"
-    ],
-    "/itemDetails/page": [
-      "static/chunks/webpack-879758e535f6a972.js",
-      "static/chunks/4bd1b696-cf72ae8a39fa05aa.js",
-      "static/chunks/964-02efbd2195ef91bd.js",
-      "static/chunks/main-app-abdf60f5a2019f26.js",
-      "static/chunks/app/itemDetails/page-13102854f433a355.js"
     ],
     "/daftarBarang/page": [
       "static/chunks/webpack-879758e535f6a972.js",

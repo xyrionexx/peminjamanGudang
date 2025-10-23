@@ -2,11 +2,11 @@
   "/_not-found/page": "/_not-found",
   "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
   "/favicon.ico/route": "/favicon.ico",
+  "/itemDetails/page": "/itemDetails",
   "/home/page": "/home",
   "/daftarBarang/[idBarang]/page": "/daftarBarang/[idBarang]",
-  "/txnPage/page": "/txnPage",
-  "/signin/page": "/signin",
   "/page": "/",
-  "/itemDetails/page": "/itemDetails",
+  "/signin/page": "/signin",
+  "/txnPage/page": "/txnPage",
   "/daftarBarang/page": "/daftarBarang"
 }
