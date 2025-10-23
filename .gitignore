@@ -20,7 +20,7 @@
 *.sql
 
 # next.js
-/.next/
+# /.next/
 # /out/
 
 # production

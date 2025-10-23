@@ -1,0 +1,12 @@
+{
+  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
+  "/_not-found/page": "/_not-found",
+  "/favicon.ico/route": "/favicon.ico",
+  "/daftarBarang/[idBarang]/page": "/daftarBarang/[idBarang]",
+  "/page": "/",
+  "/home/page": "/home",
+  "/txnPage/page": "/txnPage",
+  "/signin/page": "/signin",
+  "/itemDetails/page": "/itemDetails",
+  "/daftarBarang/page": "/daftarBarang"
+}
