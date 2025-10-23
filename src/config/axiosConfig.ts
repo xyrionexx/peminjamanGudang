@@ -17,7 +17,7 @@ export function getCookie(name: string) {
 }
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',
+  baseURL: 'http://api.borrowfy.site/api',
   withCredentials: true,
 });
 
