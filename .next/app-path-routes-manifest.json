@@ -1,12 +1,12 @@
 {
-  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
   "/_not-found/page": "/_not-found",
+  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
   "/favicon.ico/route": "/favicon.ico",
-  "/daftarBarang/[idBarang]/page": "/daftarBarang/[idBarang]",
-  "/page": "/",
   "/home/page": "/home",
+  "/daftarBarang/[idBarang]/page": "/daftarBarang/[idBarang]",
   "/txnPage/page": "/txnPage",
   "/signin/page": "/signin",
+  "/page": "/",
   "/itemDetails/page": "/itemDetails",
   "/daftarBarang/page": "/daftarBarang"
 }
