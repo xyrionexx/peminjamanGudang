@@ -2,6 +2,7 @@
 
 // REACT
 import { useEffect, useState } from 'react';
+import type { StaticImageData } from 'next/image';
 
 // SHADCN
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,13 @@ import { FoundBarang } from '@/types/global';
 import { handle_AddToCart, handle_RemoveFromCart } from '@/scripts/cartHandler';
 import { useRouter } from 'next/navigation';
 import { queryClient } from '@/config/queryClient';
+
+// Helper function to convert StaticImageData to string
+const getImageSrc = (image: string | StaticImageData | undefined): string => {
+  if (!image) return 'https://picsum.photos/seed/picsum/200';
+  if (typeof image === 'string') return image;
+  return image.src;
+};
 
 export default function ProductDetailPage() {
   // STATE
@@ -120,7 +128,7 @@ export default function ProductDetailPage() {
           <div className="space-y-4">
             <div className="aspect-square bg-card rounded-lg overflow-hidden">
               <img
-                src={barang?.gambar || 'https://picsum.photos/seed/picsum/200'}
+                src={getImageSrc(barang?.gambar)}
                 alt="Product"
                 className="w-full h-full object-cover"
               />

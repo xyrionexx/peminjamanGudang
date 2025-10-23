@@ -178,13 +178,16 @@ export default function TransactionPage() {
     } catch (error) {
       console.error(error);
 
+      const errorMessage =
+        (error instanceof Error && error.message) ||
+        (error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && ('message' in error.response.data || 'detail' in error.response.data)
+          ? ('message' in error.response.data ? String(error.response.data.message) : 'detail' in error.response.data ? String(error.response.data.detail) : '')
+          : '') ||
+        'Terjadi kesalahan saat meminta barcode. Silakan coba lagi.';
+
       notification({
         pesan: 'Gagal membuat barcode',
-        deskripsi:
-          (error as any)?.response?.data?.message ||
-          (error as any)?.response?.data?.detail ||
-          (error as any)?.message ||
-          'Terjadi kesalahan saat meminta barcode. Silakan coba lagi.',
+        deskripsi: errorMessage,
         ok: false,
       });
     }

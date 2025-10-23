@@ -1,3 +1,6 @@
+import { Loader } from 'lucide-react';
+import { StaticImageData } from 'next/image';
+
 export interface DataBarangType {
   id: number;
   gambar?: StaticImageData | string;

@@ -11,13 +11,13 @@ export function insertBarangEvent(key: string, value: FoundBarang[]) {
   );
 }
 
-interface BarangEventType {
+interface BarangEventType<T = unknown> {
   judulEvent: string;
   key?: string;
-  value?: any;
+  value?: T;
 }
 
-export function BarangEvent({ judulEvent, key, value }: BarangEventType) {
+export function BarangEvent<T>({ judulEvent, key, value }: BarangEventType<T>) {
   window.dispatchEvent(
     new CustomEvent(judulEvent, {
       detail: {

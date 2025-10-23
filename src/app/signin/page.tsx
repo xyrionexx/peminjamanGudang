@@ -5,7 +5,7 @@ import type React from 'react';
 // ==========================
 // 📦 REACT HOOKS & LIB DASAR
 // ==========================
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
 // ==========================
 // 🌐 NEXT.JS (Routing, Auth, Komponen Built-in)
@@ -38,7 +38,7 @@ interface formData {
   rememberMe: boolean;
 }
 
-export default function AuthPage() {
+function AuthPageContent() {
   // ==========================
   // ✅ HOOKS NAVIGASI & SESSION
   // ==========================
@@ -375,5 +375,13 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<Loading_circle />}>
+      <AuthPageContent />
+    </Suspense>
   );
 }

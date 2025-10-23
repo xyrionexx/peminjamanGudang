@@ -6,8 +6,7 @@ import api from '@/config/axiosConfig';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { AxiosResponse } from 'axios';
 
-export const LoginProvider = {
-  provider: [
+const loginProviders = [
     GoogleProvider({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT! as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET! as string,
@@ -51,11 +50,10 @@ export const LoginProvider = {
         }
       },
     }),
-  ],
-};
+];
 
 const handler = NextAuth({
-  providers: LoginProvider.provider,
+  providers: loginProviders,
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
@@ -73,8 +71,8 @@ const handler = NextAuth({
         token.id = user.id ?? token.sub ?? '';
         token.name = user.name ?? '';
         token.email = user.email ?? '';
-        token.accessToken = (user as any).accessToken ?? '';
-        token.refreshToken = (user as any).refreshToken ?? '';
+        token.accessToken = (user as { accessToken?: string }).accessToken ?? '';
+        token.refreshToken = (user as { refreshToken?: string }).refreshToken ?? '';
       }
 
       return token;

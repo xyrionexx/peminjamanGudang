@@ -73,7 +73,7 @@ export default function CardViews({ item, itemFromCart }: CardViewsProps): JSX.E
   // HANDLERS //
   const handle_AddToCart = (item: DataBarangType): void => {
     try {
-      var barang: FoundBarang[] = JSON.parse(localStorage.getItem('cart') ?? '[]');
+      const barang: FoundBarang[] = JSON.parse(localStorage.getItem('cart') ?? '[]');
 
       barang.push({ ...item, addedToCart: true });
 
@@ -86,7 +86,7 @@ export default function CardViews({ item, itemFromCart }: CardViewsProps): JSX.E
     } catch (error) {
       notification({
         pesan: 'Gagal nyimpen barang ke keranjang :(',
-        deskripsi: error,
+        deskripsi: error instanceof Error ? error.message : 'Unknown error',
         ok: false,
       });
       console.log('gagal menyimpan barang', error);
@@ -94,7 +94,11 @@ export default function CardViews({ item, itemFromCart }: CardViewsProps): JSX.E
   };
 
   const handleCartAction = () => {
-    itemFromCart?.addedToCart ? handle_RemoveFromCart(item.nama) : handle_AddToCart(item);
+    if (itemFromCart?.addedToCart) {
+      handle_RemoveFromCart(item.nama);
+    } else {
+      handle_AddToCart(item);
+    }
   };
   // END OF HANDLERS //
 

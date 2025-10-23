@@ -15,8 +15,8 @@ export function B_Search(daftarBarang: DataBarangType[], input: string) {
   let middle: number = count_mid(low, high); // MAIN TRACKER
 
   // STORE
-  let itemFounded: DataBarangType[] = []; // TEMP DATA STORE
-  let itemFoundedFix: (DataBarangType & { index?: number })[] = []; // MAIN DATA STORE
+  const itemFounded: DataBarangType[] = []; // TEMP DATA STORE
+  const itemFoundedFix: (DataBarangType & { index?: number })[] = []; // MAIN DATA STORE
 
   while (low <= high) {
     // NGABANDINGIN USER INPUT DENGAN NILAI INDEX SAAT INI

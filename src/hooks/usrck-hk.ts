@@ -97,7 +97,7 @@ export const useUsrck = (token: string) => {
 
       try {
         // Call API untuk validasi user dengan Bearer token
-        const res: AxiosResponse<any, any> = await api.get('/user/', {
+        const res: AxiosResponse<{ isAuthenticated: boolean }> = await api.get('/user/', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

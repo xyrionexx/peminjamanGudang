@@ -17,7 +17,7 @@ import notification from '@/components/notification';
 
 export const handle_RemoveFromCart = (nameItem: string): boolean => {
   try {
-    var barang: DataBarangType[] = JSON.parse(localStorage.getItem('cart') ?? '[]');
+    let barang: DataBarangType[] = JSON.parse(localStorage.getItem('cart') ?? '[]');
     barang = barang.sort((a, b) => a.nama.toLowerCase().localeCompare(b.nama.toLowerCase()));
 
     const hasil: FoundBarang[] | null = B_Search(barang, nameItem);
@@ -35,7 +35,7 @@ export const handle_RemoveFromCart = (nameItem: string): boolean => {
   } catch (error) {
     notification({
       pesan: 'Terjadi kesalahan pas lagi mau ngebuang',
-      deskripsi: error,
+      deskripsi: error instanceof Error ? error.message : 'Unknown error',
       ok: false,
     });
     throw new Error('error nih');
@@ -56,7 +56,7 @@ export const getBarangKeranjang = (): Map<number, FoundBarang> | null => {
 
 export const handle_AddToCart = (item: DataBarangType): void => {
   try {
-    var barang: FoundBarang[] = JSON.parse(localStorage.getItem('cart') ?? '[]');
+    const barang: FoundBarang[] = JSON.parse(localStorage.getItem('cart') ?? '[]');
 
     barang.push({ ...item, addedToCart: true });
 
