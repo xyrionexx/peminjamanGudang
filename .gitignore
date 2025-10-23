@@ -21,10 +21,10 @@
 
 # next.js
 /.next/
-/out/
+# /out/
 
 # production
-/build
+# /buildbun 
 
 # misc
 .DS_Store
